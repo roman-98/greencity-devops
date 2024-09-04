@@ -77,8 +77,8 @@ jobs:
         docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
         docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
 
-    - name: Build and push postgres image
-      run: |
-        IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/greencity-postgres:${{ env.VERSION }}
-        docker build -t $IMAGE_NAME .
-        docker push $IMAGE_NAME
+#    - name: Build and push postgres image
+#      run: |
+#        IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/greencity-postgres:${{ env.VERSION }}
+#        docker build -t $IMAGE_NAME .
+#        docker push $IMAGE_NAME
