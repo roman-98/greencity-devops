@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: ghcr.io/roman-98/greencity-postgres:1.0.0-350ad0e
     container_name: greencity_postgres
     environment:
       POSTGRES_DB: greencity
@@ -15,7 +15,7 @@ services:
       - "5432:5432"
 
   backcore:
-    image: ghcr.io/roman-98/greencity-backcore:1.0.0-4a9649a
+    image: ghcr.io/roman-98/greencity-backcore:1.0.0-350ad0e
     container_name: greencity_backcore
     environment:
       DATASOURCE_URL: jdbc:postgresql://postgres:5432/greencity
@@ -45,7 +45,7 @@ services:
       - postgres
 
   backuser:
-    image: ghcr.io/roman-98/greencity-backuser:1.0.0-4a9649a
+    image: ghcr.io/roman-98/greencity-backuser:1.0.0-350ad0e
     container_name: greencity_backuser
     environment:
       DATASOURCE_URL: jdbc:postgresql://postgres:5432/greencity
@@ -75,7 +75,7 @@ services:
       - backcore
 
   frontend:
-    image: ghcr.io/roman-98/greencity-frontend:1.0.0-4a9649a
+    image: ghcr.io/roman-98/greencity-frontend:1.0.0-350ad0e
     container_name: greencity_frontend
     ports:
       - "4200:80"
