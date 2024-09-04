@@ -1,0 +1,232 @@
+
+Dockerfile backuser & backcore
+
+------------------------------------------------
+
+FROM maven:3.9.7-eclipse-temurin-21 AS build
+WORKDIR app
+
+COPY . .
+
+RUN mvn formatter:format
+RUN mvn clean package
+
+FROM openjdk:22-ea-21-jdk-slim AS runner
+WORKDIR /runner
+COPY --from=build /app/core/target/core.jar .
+CMD java -jar ./core.jar
+
+
+
+Dockerfile frontend
+
+-------------------------------------------------------------
+
+FROM node:14-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install -g @angular/cli@9.1.15 && npm install --save-dev @angular-devkit/build-angular && npm install
+COPY . .
+RUN ng build --prod
+
+FROM nginx AS runner
+COPY --from=builder /app/dist/GreenCityClient /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: |
+          ${{ secrets.DEPLOY_KEY_BACKCORE }}
+          ${{ secrets.DEPLOY_KEY_BACKUSER }}
+          ${{ secrets.DEPLOY_KEY_FRONTEND }}
+
+    - name: Configure SSH for GitHub
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        echo -e "Host github.com-backcore\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backcore\n" >> ~/.ssh/config
+        echo -e "Host github.com-backuser\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backuser\n" >> ~/.ssh/config
+        echo -e "Host github.com-frontend\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_frontend\n" >> ~/.ssh/config
+
+    - name: Checkout backcore repo
+      run: |
+        git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git greencity-backcore-roman-98
+
+    - name: Checkout backuser repo
+      run: |
+        git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git greencity-backuser-roman-98
+
+    - name: Checkout frontend repo
+      run: |
+        git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git greencity-frontend-roman-98
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GHCR_TOKEN }}
+
+    - name: Build and push backcore image
+      run: |
+        docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:test
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:test
+
+    - name: Build and push backuser image
+      run: |
+        docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:test
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:test
+
+    - name: Build and push frontend image
+      run: |
+        docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:test
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:test
+
+    - name: Build and push postgres image
+      run: |
+        IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/greencity-postgres:test
+        docker build -t $IMAGE_NAME .
+        docker push $IMAGE_NAME
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        name: GreenCity-CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  TARGETARCH: amd64
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout backcore repo
+      uses: actions/checkout@v2
+      with:
+        repository: DevOps-ProjectLevel/greencity-backcore-roman-98
+        ref: main
+        path: greencity-backcore-roman-98
+
+    - name: Checkout backuser repo
+      uses: actions/checkout@v2
+      with:
+        repository: DevOps-ProjectLevel/greencity-backuser-roman-98
+        ref: main
+        path: greencity-backuser-roman-98
+
+    - name: Checkout frontend repo
+      uses: actions/checkout@v2
+      with:
+        repository: DevOps-ProjectLevel/greencity-frontend-roman-98
+        ref: main
+        path: greencity-frontend-roman-98
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GHCR_TOKEN }}
+
+    - name: Build and push backcore image
+      run: |
+        docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:test
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:test
+
+    - name: Build and push backuser image
+      run: |
+        docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:test
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:test
+
+    - name: Build and push frontend image
+      run: |
+        docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:test
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:test
+
+    - name: Build and push postgres image
+      run: |
+        IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/greencity-postgres:test
+        docker build -t $IMAGE_NAME .
+        docker push $IMAGE_NAME
+
+
+
+
+
+
+
+
+
+

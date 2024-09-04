@@ -1,0 +1,92 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: greencity_postgres
+    environment:
+      POSTGRES_DB: greencity
+      POSTGRES_USER: ${DATASOURCE_USER}
+      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backcore:
+    image: ghcr.io/roman-98/greencity-backcore:1.0.0-4a9649a
+    container_name: greencity_backcore
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://postgres:5432/greencity
+      DATASOURCE_USER: ${DATASOURCE_USER}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      EMAIL_ADDRESS: ${EMAIL_ADDRESS}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      GOOGLE_CLIENT_ID_MANAGER: ${GOOGLE_CLIENT_ID_MANAGER}
+      CLOUD_NAME: ${CLOUD_NAME}
+      API_KEY: ${API_KEY}
+      API_SECRET: ${API_SECRET}
+      MAX_FILE_SIZE: ${MAX_FILE_SIZE}
+      MAX_REQUEST_SIZE: ${MAX_REQUEST_SIZE}
+      BUCKET_NAME: ${BUCKET_NAME}
+      STATIC_URL: ${STATIC_URL}
+      GOOGLE_APPLICATION_CREDENTIALS: /app/google-creds.json
+      DEFAULT_PROFILE_PICTURE: ${DEFAULT_PROFILE_PICTURE}
+      AZURE_CONNECTION_STRING: ${AZURE_CONNECTION_STRING}
+      AZURE_CONTAINER_NAME: ${AZURE_CONTAINER_NAME}
+      CHAT_LINK: ${CHAT_LINK}
+      PROFILE: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  backuser:
+    image: ghcr.io/roman-98/greencity-backuser:1.0.0-4a9649a
+    container_name: greencity_backuser
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://postgres:5432/greencity
+      DATASOURCE_USER: ${DATASOURCE_USER}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      EMAIL_ADDRESS: ${EMAIL_ADDRESS}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      GOOGLE_CLIENT_ID_MANAGER: ${GOOGLE_CLIENT_ID_MANAGER}
+      CLOUD_NAME: ${CLOUD_NAME}
+      API_KEY: ${API_KEY}
+      API_SECRET: ${API_SECRET}
+      MAX_FILE_SIZE: ${MAX_FILE_SIZE}
+      MAX_REQUEST_SIZE: ${MAX_REQUEST_SIZE}
+      BUCKET_NAME: ${BUCKET_NAME}
+      STATIC_URL: ${STATIC_URL}
+      GOOGLE_APPLICATION_CREDENTIALS: /app/google-creds.json
+      DEFAULT_PROFILE_PICTURE: ${DEFAULT_PROFILE_PICTURE}
+      AZURE_CONNECTION_STRING: ${AZURE_CONNECTION_STRING}
+      AZURE_CONTAINER_NAME: ${AZURE_CONTAINER_NAME}
+      CHAT_LINK: ${CHAT_LINK}
+      PROFILE: docker
+    ports:
+      - "8060:8060"
+    depends_on:
+      - backcore
+
+  frontend:
+    image: ghcr.io/roman-98/greencity-frontend:1.0.0-4a9649a
+    container_name: greencity_frontend
+    ports:
+      - "4200:80"
+    environment:
+      BACKEND_LINK: 'http://localhost:8080/'
+      BACKEND_USER_LINK: 'http://localhost:8060/'
+      FRONTEND_LINK: 'http://localhost:4200/'
+      SOCKET: 'http://localhost:8080/socket'
+    depends_on:
+      - backcore
+      - backuser
+
+volumes:
+  postgres_data:
