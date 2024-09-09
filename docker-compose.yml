@@ -15,7 +15,7 @@ services:
       - "5432:5432"
 
   backcore:
-    image: ghcr.io/roman-98/greencity-backcore:1.0.0-d40e67b
+    image: ghcr.io/roman-98/greencity-backcore:1.0.0-626987f
     container_name: greencity_backcore
     environment:
       DATASOURCE_URL: jdbc:postgresql://postgres:5432/greencity
@@ -44,7 +44,7 @@ services:
     #entrypoint: ["/bin/sh", "-c", "sleep 200 && java -jar ./core.jar"]
 
   backuser:
-    image: ghcr.io/roman-98/greencity-backuser:1.0.0-d40e67b
+    image: ghcr.io/roman-98/greencity-backuser:1.0.0-626987f
     container_name: greencity_backuser
     environment:
       DATASOURCE_URL: jdbc:postgresql://postgres:5432/greencity
@@ -70,10 +70,10 @@ services:
       PROFILE: docker
     ports:
       - "8060:8060"
-    #entrypoint: ["/bin/sh", "-c", "sleep 300 && java -jar ./core.jar"]
+    entrypoint: ["/bin/sh", "-c", "sleep 120 && java -jar ./core.jar"]
 
   frontend:
-    image: ghcr.io/roman-98/greencity-frontend:1.0.0-d40e67b
+    image: ghcr.io/roman-98/greencity-frontend:1.0.0-626987f
     container_name: greencity_frontend
     ports:
       - "4200:80"
