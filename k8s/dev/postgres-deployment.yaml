@@ -24,12 +24,12 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
+                  name: app-secret
                   key: DATASOURCE_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
+                  name: app-secret
                   key: DATASOURCE_PASSWORD
           ports:
             - containerPort: 5432
