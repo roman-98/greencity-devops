@@ -64,18 +64,21 @@ jobs:
 
     - name: Build and push backcore image
       run: |
-        docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
+        docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
         docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
 
     - name: Build and push backuser image
       run: |
-        docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }}
+        docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:latest
         docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }}
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:latest
 
     - name: Build and push frontend image
       run: |
-        docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
+        docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:latest
         docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:latest
 
 #    - name: Build and push postgres image
 #      run: |
