@@ -25,6 +25,9 @@ resource "aws_security_group" "alb_sg" {
     Name = "${var.alb_name}-alb-sg"
     Environment = var.env
   }
+
+  depends_on = [aws_autoscaling_policy.scale_down]
+
 }
 
 resource "aws_lb" "alb" {
@@ -40,6 +43,9 @@ resource "aws_lb" "alb" {
     Name        = var.alb_name
     Environment = var.env
   }
+
+  depends_on = [aws_security_group.alb_sg]
+
 }
 
 resource "aws_lb_listener" "http_listener" {
@@ -56,6 +62,9 @@ resource "aws_lb_listener" "http_listener" {
       status_code  = "404"
     }
   }
+
+  depends_on = [aws_lb.alb]
+
 }
 
 resource "aws_lb_target_group" "alb_target_group" {
@@ -78,6 +87,9 @@ resource "aws_lb_target_group" "alb_target_group" {
     Name = "${var.alb_name}-tg"
     Environment = var.env
   }
+
+  depends_on = [aws_lb_listener.http_listener]
+
 }
 
 resource "aws_lb_listener_rule" "http_rule" {
@@ -93,4 +105,7 @@ resource "aws_lb_listener_rule" "http_rule" {
       values = var.allowed_hosts
     }
   }
+
+  depends_on = [aws_lb_target_group.alb_target_group]
+
 }
