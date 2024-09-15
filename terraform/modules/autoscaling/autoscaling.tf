@@ -32,6 +32,9 @@ resource "aws_launch_template" "lt" {
   }
 
   user_data = base64encode(var.user_data)
+
+  depends_on = [aws_security_group.rds_sg]
+
 }
 
 resource "aws_autoscaling_group" "asg" {
@@ -57,6 +60,9 @@ resource "aws_autoscaling_group" "asg" {
   health_check_grace_period = 300
 
   force_delete = false
+
+  depends_on = [aws_launch_template.lt]
+
 }
 
 resource "aws_autoscaling_policy" "scale_up" {
@@ -65,6 +71,9 @@ resource "aws_autoscaling_policy" "scale_up" {
   adjustment_type         = "ChangeInCapacity"
   cooldown                = 300
   autoscaling_group_name  = aws_autoscaling_group.asg.name
+
+  depends_on = [aws_autoscaling_group.asg]
+
 }
 
 resource "aws_autoscaling_policy" "scale_down" {
@@ -73,4 +82,7 @@ resource "aws_autoscaling_policy" "scale_down" {
   adjustment_type         = "ChangeInCapacity"
   cooldown                = 300
   autoscaling_group_name  = aws_autoscaling_group.asg.name
+
+  depends_on = [aws_autoscaling_policy.scale_up]
+
 }
