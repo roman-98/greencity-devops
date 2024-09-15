@@ -25,6 +25,9 @@ resource "aws_security_group" "rds_sg" {
     Name = "${var.db_name}-rds-sg"
     Environment = var.env
   }
+
+  depends_on = [aws_db_subnet_group.rds_subnet_group]
+
 }
 
 resource "aws_db_instance" "rds_instance" {
@@ -48,6 +51,9 @@ resource "aws_db_instance" "rds_instance" {
     Name = var.db_name
     Environment = var.env
   }
+
+  depends_on = [aws_eks_node_group.eks_node_group]
+
 }
 
 resource "aws_db_subnet_group" "rds_subnet_group" {
@@ -58,4 +64,7 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
     Name = "${var.db_name}-subnet-group"
     Environment = var.env
   }
+
+  depends_on = [aws_db_instance.rds_instance]
+
 }
