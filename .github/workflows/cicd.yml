@@ -12,7 +12,7 @@ env:
 jobs:
   ci:
     name: CI
-    if: github.ref == "refs/heads/main"
+    if: github.ref_name == 'main'
     runs-on: ubuntu-latest
 
     steps:
@@ -83,7 +83,7 @@ jobs:
 
   terraform-changes:
     name: Terraform
-    if: github.ref == "refs/heads/terraform-changes"
+    if: github.ref_name == 'terraform-changes'
     runs-on: ubuntu-latest
     defaults:
       run:
