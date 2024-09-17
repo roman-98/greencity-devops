@@ -12,6 +12,7 @@ env:
 jobs:
   ci:
     name: CI
+    if: github.ref == "refs/heads/main"
     runs-on: ubuntu-latest
 
     steps:
@@ -80,8 +81,37 @@ jobs:
         docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
         docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:latest
 
-#    - name: Build and push postgres image
-#      run: |
-#        IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/greencity-postgres:${{ env.VERSION }}
-#        docker build -t $IMAGE_NAME .
-#        docker push $IMAGE_NAME
+  terraform-changes:
+    name: Terraform
+    if: github.ref == "refs/heads/terraform-changes"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/dev 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.5
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Fmt
+        run: terraform fmt
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        if: github.event_name == 'push' 
+        run: terraform apply -auto-approve
+
+    paths:
+      - 'terraform/**/*'
