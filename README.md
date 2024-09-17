@@ -16,7 +16,7 @@
 
 <br />
 <div align="center">
-    <img src="./life-cycle-of-devops.png" width="169" height="92">
+    <img src="./img/life-cycle-of-devops.png" width="169" height="92">
   <h3 align="center">SoftServe DevOps Development </h3>
 
   <p align="center">
@@ -51,4 +51,4 @@
 
 ## About The Project
 
-![GreenCity Infrastructure](./GreenCity-Infrastructure.jpeg "GreenCity Infrastructure")
+![GreenCity Infrastructure](./img/GreenCity-Infrastructure.jpeg "GreenCity Infrastructure")
