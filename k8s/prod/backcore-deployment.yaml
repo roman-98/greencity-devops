@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backcore-deployment
+  namespace: dev
+  labels:
+    app: backcore
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backcore
+  template:
+    metadata:
+      labels:
+        app: backcore
+    spec:
+      containers:
+        - name: greencity-backcore
+          image: ghcr.io/roman-98/greencity-backcore:1.0.0-8a328d2
+          env:
+            - name: DATASOURCE_URL
+              value: jdbc:postgresql://postgres-service:5432/greencity
+            - name: DATASOURCE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DATASOURCE_USER
+            - name: DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DATASOURCE_PASSWORD
+
+            - name: EMAIL_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: EMAIL_ADDRESS
+            - name: EMAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: EMAIL_PASSWORD
+
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: GOOGLE_CLIENT_ID
+            - name: GOOGLE_API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: GOOGLE_API_KEY
+            - name: GOOGLE_CLIENT_ID_MANAGER
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: GOOGLE_CLIENT_ID_MANAGER
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /app/google-creds.json
+
+            - name: CLOUD_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: CLOUD_NAME
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: API_KEY
+            - name: API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: API_SECRET
+
+            - name: MAX_FILE_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MAX_FILE_SIZE
+            - name: MAX_REQUEST_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MAX_REQUEST_SIZE
+
+            - name: BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: BUCKET_NAME
+            - name: STATIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: STATIC_URL
+
+            - name: DEFAULT_PROFILE_PICTURE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DEFAULT_PROFILE_PICTURE
+
+            - name: AZURE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: AZURE_CONNECTION_STRING
+            - name: AZURE_CONTAINER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: AZURE_CONTAINER_NAME
+            - name: EndpointSuffix
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: EndpointSuffix      
+
+            - name: CHAT_LINK
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: CHAT_LINK
+
+            - name: PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PROFILE
+          ports:
+            - containerPort: 8080
