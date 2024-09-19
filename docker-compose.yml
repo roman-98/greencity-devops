@@ -80,7 +80,7 @@ services:
     environment:
       BACKEND_LINK: 'http://backcore-service:8080/'
       BACKEND_USER_LINK: 'http://backuser-service:8060/'
-      FRONTEND_LINK: 'http://frontend-service:4200/'
+      FRONTEND_LINK: 'http://frontend-service:80/'
       SOCKET: 'http://backcore-service:8080/socket'
     depends_on:
       - backcore
