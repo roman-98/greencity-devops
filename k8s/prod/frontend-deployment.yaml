@@ -19,4 +19,4 @@ spec:
         - name: greencity-frontend
           image: ghcr.io/roman-98/greencity-frontend:1.0.0-8a328d2
           ports:
-            - containerPort: 4200
+            - containerPort: 80
