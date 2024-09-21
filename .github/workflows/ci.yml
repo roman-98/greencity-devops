@@ -9,20 +9,20 @@ on:
 jobs:
   Backcore:
     uses: roman-98/greencity-devops/.github/workflows/build_push_backcore.yml@main
-    with:
+    secrets:
       ssh-private-key: ${{ secrets.DEPLOY_KEY_BACKCORE }}
       password: ${{ secrets.GHCR_TOKEN }}
 
   Backuser:
     needs: Backcore
     uses: roman-98/greencity-devops/.github/workflows/build_push_backuser.yml@main
-    with:
+    secrets:
       ssh-private-key: ${{ secrets.DEPLOY_KEY_BACKUSER }}
       password: ${{ secrets.GHCR_TOKEN }}
 
   Frontend:
     needs: Backuser
     uses: roman-98/greencity-devops/.github/workflows/build_push_frontend.yml@main
-    with:
+    secrets:
       ssh-private-key: ${{ secrets.DEPLOY_KEY_FRONTEND }}
       password: ${{ secrets.GHCR_TOKEN }}
