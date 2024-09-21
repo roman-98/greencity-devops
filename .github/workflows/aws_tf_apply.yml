@@ -37,15 +37,15 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: cd terraform/ terraform init
+        run: cd terraform/ && terraform init
       
       - name: Terraform Validate
         id: validate
-        run: terraform validate
+        run: cd terraform/ && terraform validate
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan
+        run: cd terraform/ && terraform plan
         continue-on-error: true
 
       - name: Terraform Plan Status
@@ -53,7 +53,7 @@ jobs:
         run: exit 1
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: cd terraform/ && terraform apply -auto-approve
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve
+        run: cd terraform/ && terraform destroy -auto-approve
