@@ -37,15 +37,15 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: cd terraform/ && terraform init
       
       - name: Terraform Validate
         id: validate
-        run: terraform validate
+        run: cd terraform/ && terraform validate
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan
+        run: cd terraform/ && terraform plan
         continue-on-error: true
 
       - name: Terraform Plan Status
