@@ -1,4 +1,4 @@
-name: "Build-Tf-Plan"
+name: "terraform plan"
 
 on:
   workflow_call:

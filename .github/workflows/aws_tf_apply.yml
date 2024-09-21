@@ -1,4 +1,4 @@
-name: "Apply-Tf-Plan"
+name: "terraform apply"
 
 on:
   workflow_call:
