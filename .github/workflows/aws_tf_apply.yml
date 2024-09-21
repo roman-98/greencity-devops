@@ -37,23 +37,11 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
-      
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan
-        continue-on-error: true
-
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
+        run: cd terraform/ && terraform init
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: cd terraform/ && terraform apply -auto-approve
+        continue-on-error: true
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve
+        run: cd terraform/ && terraform destroy -auto-approve

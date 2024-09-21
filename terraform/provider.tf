@@ -23,7 +23,7 @@ backend "remote" {
 		organization = "GreenCity"
 
 		workspaces {
-			name = "greencity-eks"
+			name = "greencity-aws"
 		}
 	}
 }

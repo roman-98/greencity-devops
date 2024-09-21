@@ -1,4 +1,3 @@
-###### vpc/outputs.tf 
 output "aws_public_subnet" {
   value = aws_subnet.public_greencity_subnet.*.id
 }

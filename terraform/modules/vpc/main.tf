@@ -1,4 +1,3 @@
-#######modules/vpc/main.tf
 resource "aws_vpc" "greencity" {
   cidr_block       = var.vpc_cidr 
   instance_tenancy = var.instance_tenancy
