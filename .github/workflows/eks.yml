@@ -16,7 +16,7 @@ jobs:
 
   Apply:
     needs: Plan
-    uses: roman-98/greencity-devops/.github/workflows/aws_tf_appy.yml@main
+    uses: roman-98/greencity-devops/.github/workflows/aws_tf_apply.yml@main
     with:
       gh_environment: dev
     secrets:
