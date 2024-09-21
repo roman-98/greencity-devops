@@ -8,7 +8,7 @@ on:
 
 jobs:
   Plan:
-    uses: roman-98/greencity-devops/.github/workflows/aws_tf_plan.yml@main
+    uses: roman-98/greencity-devops/.github/workflows/aws_tf_plan.yml@tf-changes
     with:
       gh_environment: dev
     secrets:
@@ -16,7 +16,7 @@ jobs:
 
   Apply:
     needs: Plan
-    uses: roman-98/greencity-devops/.github/workflows/aws_tf_apply.yml@main
+    uses: roman-98/greencity-devops/.github/workflows/aws_tf_apply.yml@tf-changes
     with:
       gh_environment: dev
     secrets:
