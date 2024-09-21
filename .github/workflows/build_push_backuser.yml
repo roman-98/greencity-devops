@@ -18,7 +18,7 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.ssh_private_key }}" > ~/.ssh/id_backuser
+          echo "${{ secrets.DEPLOY_KEY_BACKUSER }}" > ~/.ssh/id_backuser
           chmod 600 ~/.ssh/id_backuser
           ssh-keyscan github.com >> ~/.ssh/known_hosts
           echo -e "Host github.com-backuser\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backuser\n" >> ~/.ssh/config

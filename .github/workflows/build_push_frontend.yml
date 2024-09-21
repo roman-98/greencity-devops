@@ -18,7 +18,7 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.ssh_private_key }}" > ~/.ssh/id_frontend
+          echo "${{ secrets.DEPLOY_KEY_FRONTEND }}" > ~/.ssh/id_frontend
           chmod 600 ~/.ssh/id_frontend
           ssh-keyscan github.com >> ~/.ssh/known_hosts
           echo -e "Host github.com-frontend\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_frontend\n" >> ~/.ssh/config
