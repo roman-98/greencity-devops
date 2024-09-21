@@ -1,77 +1,25 @@
-name: GreenCity-CI
+name: "GreenCity-CI"
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  ci:
-    name: CI
-    runs-on: ubuntu-latest
+  Backcore:
+    uses: roman-98/greencity-devops/.github/workflows/build_push_backcore.yml@main
+    secrets:
+      ssh_private_key: ${{ secrets.DEPLOY_KEY_BACKCORE }}
 
-    steps:
-    - uses: actions/checkout@v2
+  Backuser:
+    needs: Backcore
+    uses: roman-98/greencity-devops/.github/workflows/build_push_backuser.yml@main
+    secrets:
+      ssh_private_key: ${{ secrets.DEPLOY_KEY_BACKUSER }}
 
-    - name: Setup SSH
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: |
-          ${{ secrets.DEPLOY_KEY_BACKCORE }}
-          ${{ secrets.DEPLOY_KEY_BACKUSER }}
-          ${{ secrets.DEPLOY_KEY_FRONTEND }}
-
-    - name: Configure SSH for GitHub
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.DEPLOY_KEY_BACKCORE }}" > ~/.ssh/id_backcore
-        echo "${{ secrets.DEPLOY_KEY_BACKUSER }}" > ~/.ssh/id_backuser
-        echo "${{ secrets.DEPLOY_KEY_FRONTEND }}" > ~/.ssh/id_frontend
-        chmod 600 ~/.ssh/id_*
-        ssh-keyscan github.com >> ~/.ssh/known_hosts
-        echo -e "Host github.com-backcore\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backcore\n" >> ~/.ssh/config
-        echo -e "Host github.com-backuser\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backuser\n" >> ~/.ssh/config
-        echo -e "Host github.com-frontend\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_frontend\n" >> ~/.ssh/config
-
-    - name: Checkout backcore repo
-      run: |
-        git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git greencity-backcore-roman-98
-
-    - name: Checkout backuser repo
-      run: |
-        git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git greencity-backuser-roman-98
-
-    - name: Checkout frontend repo
-      run: |
-        git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git greencity-frontend-roman-98
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GHCR_TOKEN }}
-
-    - name: Set version
-      run: echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
-
-    - name: Build and push backcore image
-      run: |
-        docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
-        docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
-        docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
-
-    - name: Build and push backuser image
-      run: |
-        docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:latest
-        docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }}
-        docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:latest
-
-    - name: Build and push frontend image
-      run: |
-        docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:latest
-        docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
-        docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:latest
+  Frontend:
+    needs: Backuser
+    uses: roman-98/greencity-devops/.github/workflows/build_push_frontend.yml@main
+    secrets:
+      ssh_private_key: ${{ secrets.DEPLOY_KEY_FRONTEND }}
