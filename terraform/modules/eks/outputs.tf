@@ -1,19 +1,16 @@
-output "eks_cluster_id" {
-  value = aws_eks_cluster.eks.id
+output "endpoint" {
+  value = aws_eks_cluster.greencity.endpoint
 }
 
-output "eks_cluster_endpoint" {
-  value = aws_eks_cluster.eks.endpoint
+output "kubeconfig-certificate-authority-data" {
+  value = aws_eks_cluster.greencity.certificate_authority[0].data
 }
-
-output "eks_cluster_arn" {
-  value = aws_eks_cluster.eks.arn
+output "cluster_id" {
+  value = aws_eks_cluster.greencity.id
 }
-
-output "eks_cluster_version" {
-  value = aws_eks_cluster.eks.version
+output "cluster_endpoint" {
+  value = aws_eks_cluster.greencity.endpoint
 }
-
-output "eks_node_group_arn" {
-  value = aws_eks_node_group.eks_node_group.arn
+output "cluster_name" {
+  value = aws_eks_cluster.greencity.name
 }

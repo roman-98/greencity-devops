@@ -1,69 +1,25 @@
-variable "region" {
-  description = "Region to deploy EKS"
-  type        = string
-}
+#######modules/eks/variables.tf
 
-variable "env" {
-  description = "Environment (dev, prod)"
-  type        = string
-}
+variable "aws_public_subnet" {}
 
-variable "cluster_name" {
-  description = "Name of the EKS cluster"
-  type        = string
-}
+variable "vpc_id" {}
 
-variable "vpc_id" {
-  description = "VPC ID where EKS will be deployed"
-  type        = string
-}
+variable "cluster_name" {}
 
-variable "public_subnets_ids" {
-  description = "List of public subnet IDs"
-  type        = list(string)
-}
+variable "endpoint_private_access" {}
 
-variable "eks_role_arn" {
-  description = "ARN of the EKS cluster IAM role (created externally)"
-  type        = string
-}
+variable "endpoint_public_access" {}
 
-variable "node_role_arn" {
-  description = "ARN of the IAM role for EKS worker nodes (created externally)"
-  type        = string
-}
+variable "public_access_cidrs" {}
 
-variable "desired_size" {
-  description = "Desired number of worker nodes"
-  type        = number
-  default     = 2
-}
+variable "node_group_name" {}
 
-variable "max_size" {
-  description = "Maximum number of worker nodes"
-  type        = number
-  default     = 4
-}
+variable "scaling_desired_size" {}
 
-variable "min_size" {
-  description = "Minimum number of worker nodes"
-  type        = number
-  default     = 1
-}
+variable "scaling_max_size" {}
 
-variable "instance_type" {
-  description = "EC2 instance type for worker nodes"
-  type        = string
-  default     = "t3.medium"
-}
+variable "scaling_min_size" {}
 
-variable "ssh_key_name" {
-  description = "SSH key name to access worker nodes"
-  type        = string
-}
+variable "instance_types" {}
 
-variable "kubernetes_version" {
-  description = "Kubernetes version for EKS cluster"
-  type        = string
-  default     = "1.21"
-}
+variable "key_pair" {}
