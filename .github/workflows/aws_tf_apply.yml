@@ -17,9 +17,7 @@ on:
       cli_config_credentials_token:
         description: 'cli config credentials token'
         required: true
-permissions:
-  id-token: write
-  contents: read    
+  
 jobs:
   apply-plan:
     runs-on: ubuntu-latest
