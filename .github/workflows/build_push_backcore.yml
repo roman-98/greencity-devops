@@ -2,6 +2,11 @@ name: Build and Push Backcore
 
 on:
   workflow_call:
+    secrets:
+      ssh-private-key:
+        required: true
+      ghcr_token:
+        required: true
 
 jobs:
   build:
