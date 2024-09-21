@@ -10,16 +10,16 @@ jobs:
   Backcore:
     uses: roman-98/greencity-devops/.github/workflows/build_push_backcore.yml@main
     secrets:
-      ssh_private_key: ${{ secrets.DEPLOY_KEY_BACKCORE }}
+      DEPLOY_KEY_BACKCORE: ${{ secrets.DEPLOY_KEY_BACKCORE }}
 
   Backuser:
     needs: Backcore
     uses: roman-98/greencity-devops/.github/workflows/build_push_backuser.yml@main
     secrets:
-      ssh_private_key: ${{ secrets.DEPLOY_KEY_BACKUSER }}
+      DEPLOY_KEY_BACKUSER: ${{ secrets.DEPLOY_KEY_BACKUSER }}
 
   Frontend:
     needs: Backuser
     uses: roman-98/greencity-devops/.github/workflows/build_push_frontend.yml@main
     secrets:
-      ssh_private_key: ${{ secrets.DEPLOY_KEY_FRONTEND }}
+      DEPLOY_KEY_FRONTEND: ${{ secrets.DEPLOY_KEY_FRONTEND }}
