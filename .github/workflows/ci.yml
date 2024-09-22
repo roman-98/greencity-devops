@@ -102,6 +102,7 @@ jobs:
     name: Notify on completion
     needs: build_and_push
     runs-on: ubuntu-latest
+    environment: CI
     steps:
       - name: Send notification
         uses: 8398a7/action-slack@v3
