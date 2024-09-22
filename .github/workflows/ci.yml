@@ -71,7 +71,7 @@ jobs:
       run: git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git greencity-frontend-roman-98
 
   setup-docker:
-    name: Setup Docker
+    name: Setup
     runs-on: ubuntu-latest
     steps:
     - name: Set up Docker Buildx
