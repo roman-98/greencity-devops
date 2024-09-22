@@ -12,8 +12,7 @@ jobs:
   setup:
     name: Setup Environment
     runs-on: ubuntu-latest
-    with:
-      gh_environment: CI
+    environment: CI
     steps:
       - uses: actions/checkout@v3
       - name: Setup SSH
@@ -46,8 +45,7 @@ jobs:
     name: Clone Repository
     needs: setup
     runs-on: ubuntu-latest
-    with:
-      gh_environment: CI
+    environment: CI
     strategy:
       matrix:
         repo: [backcore, backuser, frontend]
@@ -70,8 +68,7 @@ jobs:
     name: Build and Push 
     needs: clone_repositories
     runs-on: ubuntu-latest
-    with:
-      gh_environment: CI
+    environment: CI
     strategy:
       matrix:
         component: [backcore, backuser, frontend]
