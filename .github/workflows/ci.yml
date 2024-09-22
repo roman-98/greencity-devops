@@ -67,7 +67,7 @@ jobs:
       - name: Checkout frontend repo
         run: git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git greencity-frontend-roman-98
 
-   build_and_push_backcore:
+  build_and_push_backcore:
     runs-on: ubuntu-latest
     needs: checkout_backcore
     steps:
