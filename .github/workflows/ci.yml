@@ -87,7 +87,7 @@ jobs:
 
   build-push-backcore:
     name: Build and Push Backcore
-    needs: [checkout-backcore, setup-docker, set-version]
+    needs: setup-docker
     runs-on: ubuntu-latest
     steps:
     - name: Build and push backcore image
@@ -98,7 +98,7 @@ jobs:
 
   build-push-backuser:
     name: Build and Push Backuser
-    needs: [checkout-backuser, setup-docker, set-version]
+    needs: setup-docker
     runs-on: ubuntu-latest
     steps:
     - name: Build and push backuser image
@@ -109,7 +109,7 @@ jobs:
 
   build-push-frontend:
     name: Build and Push Frontend
-    needs: [checkout-frontend, setup-docker, set-version]
+    needs: setup-docker
     runs-on: ubuntu-latest
     steps:
     - name: Build and push frontend image
