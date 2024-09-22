@@ -20,6 +20,7 @@ jobs:
 
   set-version:
     name: Set Version
+    needs: setup-ssh
     runs-on: ubuntu-latest
     steps:
     - name: Set version
@@ -27,7 +28,7 @@ jobs:
 
   checkout-backcore:
     name: Checkout Backcore
-    needs: setup-ssh
+    needs: set-version
     runs-on: ubuntu-latest
     steps:
     - name: Setup SSH for Backcore
@@ -42,7 +43,7 @@ jobs:
 
   checkout-backuser:
     name: Checkout Backuser
-    needs: setup-ssh
+    needs: set-version
     runs-on: ubuntu-latest
     steps:
     - name: Setup SSH for Backuser
@@ -57,7 +58,7 @@ jobs:
 
   checkout-frontend:
     name: Checkout Frontend
-    needs: setup-ssh
+    needs: set-version
     runs-on: ubuntu-latest
     steps:
     - name: Setup SSH for Frontend
@@ -72,6 +73,7 @@ jobs:
 
   setup-docker:
     name: Setup
+    needs: [checkout-backcore, checkout-backuser, checkout-frontend]
     runs-on: ubuntu-latest
     steps:
     - name: Set up Docker Buildx
