@@ -61,6 +61,8 @@ jobs:
         with:
           path: |
             greencity-backcore-roman-98
+            greencity-backuser-roman-98
+            greencity-frontend-roman-98
           key: ${{ runner.os }}-repos-${{ github.sha }}
 
       - name: Set up Docker Buildx
@@ -70,26 +72,12 @@ jobs:
         env:
           VERSION: 1.0.0-${{ github.sha }}
         run: |
-          echo "Current directory: $(pwd)"
-          echo "Contents of current directory:"
-          ls -la
-          echo "Contents of greencity-backcore-roman-98 directory:"
-          ls -la greencity-backcore-roman-98
-          cd greencity-backcore-roman-98
-          echo "Building Docker image with tag: ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION"
-          docker build -t "ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION" .
-          echo "Docker images after build:"
-          docker images
+          docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION .
 
       - name: Save Docker image
-        env:
-          VERSION: 1.0.0-${{ github.sha }}
         run: |
-          echo "Saving Docker image to file..."
           mkdir -p /tmp/backcore-image
-          docker save "ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION" > /tmp/backcore-image/image.tar
-          echo "Contents of /tmp/backcore-image:"
-          ls -la /tmp/backcore-image
+          docker save ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION > /tmp/backcore-image/image.tar
 
       - name: Cache Docker image
         uses: actions/cache@v2
@@ -108,13 +96,7 @@ jobs:
           key: ${{ runner.os }}-backcore-${{ github.sha }}
 
       - name: Load Docker image
-        env:
-          VERSION: 1.0.0-${{ github.sha }}
-        run: |
-          echo "Loading Docker image from file..."
-          docker load < /tmp/backcore-image/image.tar
-          echo "Docker images after load:"
-          docker images
+        run: docker load < /tmp/backcore-image/image.tar
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
@@ -127,9 +109,8 @@ jobs:
         env:
           VERSION: 1.0.0-${{ github.sha }}
         run: |
-          echo "Pushing Docker image..."
-          docker push "ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION"
-          docker push "ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest"
+          docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION
+          docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
 
   build_backuser:
     needs: checkout
@@ -139,7 +120,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
+            greencity-backcore-roman-98
             greencity-backuser-roman-98
+            greencity-frontend-roman-98
           key: ${{ runner.os }}-repos-${{ github.sha }}
 
       - name: Set up Docker Buildx
@@ -149,8 +132,7 @@ jobs:
         env:
           VERSION: 1.0.0-${{ github.sha }}
         run: |
-          cd greencity-backuser-roman-98
-          docker build -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:$VERSION .
+          docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:$VERSION .
 
       - name: Save Docker image
         run: |
@@ -198,6 +180,8 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
+            greencity-backcore-roman-98
+            greencity-backuser-roman-98
             greencity-frontend-roman-98
           key: ${{ runner.os }}-repos-${{ github.sha }}
 
@@ -208,8 +192,7 @@ jobs:
         env:
           VERSION: 1.0.0-${{ github.sha }}
         run: |
-          cd greencity-frontend-roman-98
-          docker build -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:$VERSION .
+          docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:$VERSION .
 
       - name: Save Docker image
         run: |
