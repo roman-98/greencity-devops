@@ -17,17 +17,6 @@ jobs:
           ${{ secrets.DEPLOY_KEY_BACKCORE }}
           ${{ secrets.DEPLOY_KEY_BACKUSER }}
           ${{ secrets.DEPLOY_KEY_FRONTEND }}
-    - name: Configure SSH for GitHub
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.DEPLOY_KEY_BACKCORE }}" > ~/.ssh/id_backcore
-        echo "${{ secrets.DEPLOY_KEY_BACKUSER }}" > ~/.ssh/id_backuser
-        echo "${{ secrets.DEPLOY_KEY_FRONTEND }}" > ~/.ssh/id_frontend
-        chmod 600 ~/.ssh/id_*
-        ssh-keyscan github.com >> ~/.ssh/known_hosts
-        echo -e "Host github.com-backcore\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backcore\n" >> ~/.ssh/config
-        echo -e "Host github.com-backuser\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backuser\n" >> ~/.ssh/config
-        echo -e "Host github.com-frontend\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_frontend\n" >> ~/.ssh/config
 
   set-version:
     name: Set Version
@@ -41,6 +30,13 @@ jobs:
     needs: setup-ssh
     runs-on: ubuntu-latest
     steps:
+    - name: Setup SSH for Backcore
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DEPLOY_KEY_BACKCORE }}" > ~/.ssh/id_backcore
+        chmod 600 ~/.ssh/id_backcore
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        echo -e "Host github.com-backcore\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backcore\n" >> ~/.ssh/config
     - name: Checkout backcore repo
       run: git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git greencity-backcore-roman-98
 
@@ -49,6 +45,13 @@ jobs:
     needs: setup-ssh
     runs-on: ubuntu-latest
     steps:
+    - name: Setup SSH for Backuser
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DEPLOY_KEY_BACKUSER }}" > ~/.ssh/id_backuser
+        chmod 600 ~/.ssh/id_backuser
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        echo -e "Host github.com-backuser\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backuser\n" >> ~/.ssh/config
     - name: Checkout backuser repo
       run: git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git greencity-backuser-roman-98
 
@@ -57,6 +60,13 @@ jobs:
     needs: setup-ssh
     runs-on: ubuntu-latest
     steps:
+    - name: Setup SSH for Frontend
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DEPLOY_KEY_FRONTEND }}" > ~/.ssh/id_frontend
+        chmod 600 ~/.ssh/id_frontend
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        echo -e "Host github.com-frontend\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_frontend\n" >> ~/.ssh/config
     - name: Checkout frontend repo
       run: git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git greencity-frontend-roman-98
 
