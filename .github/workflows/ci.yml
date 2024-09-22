@@ -61,8 +61,6 @@ jobs:
         with:
           path: |
             greencity-backcore-roman-98
-            greencity-backuser-roman-98
-            greencity-frontend-roman-98
           key: ${{ runner.os }}-repos-${{ github.sha }}
 
       - name: Set up Docker Buildx
@@ -72,13 +70,26 @@ jobs:
         env:
           VERSION: 1.0.0-${{ github.sha }}
         run: |
+          echo "Current directory: $(pwd)"
+          echo "Contents of current directory:"
+          ls -la
+          echo "Contents of greencity-backcore-roman-98 directory:"
+          ls -la greencity-backcore-roman-98
           cd greencity-backcore-roman-98
-          docker build -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION .
+          echo "Building Docker image with tag: ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION"
+          docker build -t "ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION" .
+          echo "Docker images after build:"
+          docker images
 
       - name: Save Docker image
+        env:
+          VERSION: 1.0.0-${{ github.sha }}
         run: |
+          echo "Saving Docker image to file..."
           mkdir -p /tmp/backcore-image
-          docker save ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION > /tmp/backcore-image/image.tar
+          docker save "ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION" > /tmp/backcore-image/image.tar
+          echo "Contents of /tmp/backcore-image:"
+          ls -la /tmp/backcore-image
 
       - name: Cache Docker image
         uses: actions/cache@v2
@@ -97,7 +108,13 @@ jobs:
           key: ${{ runner.os }}-backcore-${{ github.sha }}
 
       - name: Load Docker image
-        run: docker load < /tmp/backcore-image/image.tar
+        env:
+          VERSION: 1.0.0-${{ github.sha }}
+        run: |
+          echo "Loading Docker image from file..."
+          docker load < /tmp/backcore-image/image.tar
+          echo "Docker images after load:"
+          docker images
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
@@ -110,8 +127,9 @@ jobs:
         env:
           VERSION: 1.0.0-${{ github.sha }}
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION
-          docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
+          echo "Pushing Docker image..."
+          docker push "ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION"
+          docker push "ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest"
 
   build_backuser:
     needs: checkout
@@ -121,9 +139,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            greencity-backcore-roman-98
             greencity-backuser-roman-98
-            greencity-frontend-roman-98
           key: ${{ runner.os }}-repos-${{ github.sha }}
 
       - name: Set up Docker Buildx
@@ -182,8 +198,6 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            greencity-backcore-roman-98
-            greencity-backuser-roman-98
             greencity-frontend-roman-98
           key: ${{ runner.os }}-repos-${{ github.sha }}
 
