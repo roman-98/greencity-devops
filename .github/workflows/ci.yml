@@ -14,10 +14,10 @@ jobs:
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
-        ssh-private-key: |
-          ${{ secrets.DEPLOY_KEY_BACKCORE }}
-          ${{ secrets.DEPLOY_KEY_BACKUSER }}
-          ${{ secrets.DEPLOY_KEY_FRONTEND }}
+          ssh-private-key: |
+            ${{ secrets.DEPLOY_KEY_BACKCORE }}
+            ${{ secrets.DEPLOY_KEY_BACKUSER }}
+            ${{ secrets.DEPLOY_KEY_FRONTEND }}
 
       - name: Configure SSH for GitHub
         run: |
