@@ -6,9 +6,8 @@ on:
       - main
 
 jobs:
-  setup:
+  checkout_backcore:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
 
@@ -25,10 +24,6 @@ jobs:
           ssh-keyscan github.com >> ~/.ssh/known_hosts
           echo -e "Host github.com-backcore\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backcore\n" >> ~/.ssh/config
 
-  checkout_backcore:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
       - name: Checkout backcore repo
         run: git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git greencity-backcore-roman-98
 
