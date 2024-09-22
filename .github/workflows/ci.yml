@@ -65,14 +65,16 @@ jobs:
           cd greencity-backcore-roman-98
           docker build -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION .
 
+      - name: Save Docker image
+        run: |
+          mkdir -p /tmp/backcore-image
+          docker save ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION > /tmp/backcore-image/image.tar
+
       - name: Cache Docker image
         uses: actions/cache@v2
         with:
           path: /tmp/backcore-image
           key: ${{ runner.os }}-backcore-${{ github.sha }}
-        run: |
-          mkdir -p /tmp/backcore-image
-          docker save ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION > /tmp/backcore-image/image.tar
 
   push_backcore:
     needs: build_backcore
@@ -124,14 +126,16 @@ jobs:
           cd greencity-backuser-roman-98
           docker build -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:$VERSION .
 
+      - name: Save Docker image
+        run: |
+          mkdir -p /tmp/backuser-image
+          docker save ghcr.io/${{ github.repository_owner }}/greencity-backuser:$VERSION > /tmp/backuser-image/image.tar
+
       - name: Cache Docker image
         uses: actions/cache@v2
         with:
           path: /tmp/backuser-image
           key: ${{ runner.os }}-backuser-${{ github.sha }}
-        run: |
-          mkdir -p /tmp/backuser-image
-          docker save ghcr.io/${{ github.repository_owner }}/greencity-backuser:$VERSION > /tmp/backuser-image/image.tar
 
   push_backuser:
     needs: build_backuser
@@ -183,14 +187,16 @@ jobs:
           cd greencity-frontend-roman-98
           docker build -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:$VERSION .
 
+      - name: Save Docker image
+        run: |
+          mkdir -p /tmp/frontend-image
+          docker save ghcr.io/${{ github.repository_owner }}/greencity-frontend:$VERSION > /tmp/frontend-image/image.tar
+
       - name: Cache Docker image
         uses: actions/cache@v2
         with:
           path: /tmp/frontend-image
           key: ${{ runner.os }}-frontend-${{ github.sha }}
-        run: |
-          mkdir -p /tmp/frontend-image
-          docker save ghcr.io/${{ github.repository_owner }}/greencity-frontend:$VERSION > /tmp/frontend-image/image.tar
 
   push_frontend:
     needs: build_frontend
