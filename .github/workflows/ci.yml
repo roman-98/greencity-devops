@@ -6,70 +6,46 @@ on:
       - main
 
 jobs:
-  checkout_backcore:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup SSH for Backcore
+      - name: Setup SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY_BACKCORE }}
+          ssh-private-key: |
+            ${{ secrets.DEPLOY_KEY_BACKCORE }}
+            ${{ secrets.DEPLOY_KEY_BACKUSER }}
+            ${{ secrets.DEPLOY_KEY_FRONTEND }}
 
-      - name: Configure SSH for Backcore
+      - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_KEY_BACKCORE }}" > ~/.ssh/id_backcore
-          chmod 600 ~/.ssh/id_backcore
+          echo "${{ secrets.DEPLOY_KEY_BACKUSER }}" > ~/.ssh/id_backuser
+          echo "${{ secrets.DEPLOY_KEY_FRONTEND }}" > ~/.ssh/id_frontend
+          chmod 600 ~/.ssh/id_*
           ssh-keyscan github.com >> ~/.ssh/known_hosts
           echo -e "Host github.com-backcore\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backcore\n" >> ~/.ssh/config
-
-      - name: Checkout backcore repo
-        run: git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git greencity-backcore-roman-98
-
-  checkout_backuser:
-    runs-on: ubuntu-latest
-    needs: checkout_backcore
-    steps:
-      - name: Setup SSH for Backuser
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY_BACKUSER }}
-
-      - name: Configure SSH for Backuser
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY_BACKUSER }}" > ~/.ssh/id_backuser
-          chmod 600 ~/.ssh/id_backuser
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
           echo -e "Host github.com-backuser\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backuser\n" >> ~/.ssh/config
-
-      - name: Checkout backuser repo
-        run: git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git greencity-backuser-roman-98
-
-  checkout_frontend:
-    runs-on: ubuntu-latest
-    needs: checkout_backuser
-    steps:
-      - name: Setup SSH for Frontend
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY_FRONTEND }}
-
-      - name: Configure SSH for Frontend
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY_FRONTEND }}" > ~/.ssh/id_frontend
-          chmod 600 ~/.ssh/id_frontend
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
           echo -e "Host github.com-frontend\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_frontend\n" >> ~/.ssh/config
 
-      - name: Checkout frontend repo
-        run: git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git greencity-frontend-roman-98
+      - name: Checkout all repositories
+        run: |
+          git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git
+          git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git
+          git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git
+
+      - name: Verify repositories
+        run: |
+          ls -la ./greencity-backcore-roman-98
+          ls -la ./greencity-backuser-roman-98
+          ls -la ./greencity-frontend-roman-98
 
   build_and_push_backcore:
     runs-on: ubuntu-latest
-    needs: checkout_backcore
+    needs: setup
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -85,7 +61,7 @@ jobs:
 
   build_and_push_backuser:
     runs-on: ubuntu-latest
-    needs: checkout_backuser
+    needs: setup
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -101,7 +77,7 @@ jobs:
 
   build_and_push_frontend:
     runs-on: ubuntu-latest
-    needs: checkout_frontend
+    needs: setup
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
