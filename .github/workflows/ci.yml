@@ -29,9 +29,9 @@ jobs:
 
       - name: Checkout all repos
         run: |
-          git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git
-          git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git
-          git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git
+          git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git greencity-backcore-roman-98
+          git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git greencity-backuser-roman-98
+          git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git greencity-frontend-roman-98
 
       - name: Cache repos
         uses: actions/cache@v2
