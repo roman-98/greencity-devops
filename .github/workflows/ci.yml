@@ -36,7 +36,7 @@ jobs:
           restore-keys: backcore-repo-
 
       - name: Upload backcore as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: backcore-repo
           path: greencity-backcore-roman-98
@@ -47,7 +47,7 @@ jobs:
     needs: clone_backcore
     steps:
       - name: Download backcore artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: backcore-repo
 
@@ -69,7 +69,7 @@ jobs:
         run: docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
 
       - name: Upload Docker image for backcore as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: backcore-docker-image
           path: /tmp/.buildx-cache
@@ -80,7 +80,7 @@ jobs:
     needs: build_backcore
     steps:
       - name: Download backcore Docker image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: backcore-docker-image
 
@@ -126,7 +126,7 @@ jobs:
           restore-keys: backuser-repo-
 
       - name: Upload backuser as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: backuser-repo
           path: greencity-backuser-roman-98
@@ -137,7 +137,7 @@ jobs:
     needs: clone_backuser
     steps:
       - name: Download backuser artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: backuser-repo
 
@@ -159,7 +159,7 @@ jobs:
         run: docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:latest
 
       - name: Upload Docker image for backuser as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: backuser-docker-image
           path: /tmp/.buildx-cache
@@ -170,7 +170,7 @@ jobs:
     needs: build_backuser
     steps:
       - name: Download backuser Docker image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: backuser-docker-image
 
@@ -216,7 +216,7 @@ jobs:
           restore-keys: frontend-repo-
 
       - name: Upload frontend as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-repo
           path: greencity-frontend-roman-98
@@ -227,7 +227,7 @@ jobs:
     needs: clone_frontend
     steps:
       - name: Download frontend artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: frontend-repo
 
@@ -249,7 +249,7 @@ jobs:
         run: docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:latest
 
       - name: Upload Docker image for frontend as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-docker-image
           path: /tmp/.buildx-cache
@@ -260,7 +260,7 @@ jobs:
     needs: build_frontend
     steps:
       - name: Download frontend Docker image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: frontend-docker-image
 
