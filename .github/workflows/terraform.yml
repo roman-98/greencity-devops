@@ -21,3 +21,22 @@ jobs:
       gh_environment: Terraform
     secrets:
       cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
+
+  notify:
+    name: Notify on completion
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: 8398a7/action-slack@v3
+        with:
+          fields: workflow,job,commit,repo,ref,author,took
+          status: ${{ job.status }}
+          text: |
+            Workflow completed for *${{ github.workflow }}*.
+            Status: *${{ job.status }}*
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Triggered by: ${{ github.actor }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
