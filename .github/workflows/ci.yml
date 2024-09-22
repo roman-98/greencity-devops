@@ -27,11 +27,17 @@ jobs:
           echo -e "Host github.com-backuser\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_rsa_2\n" >> ~/.ssh/config
           echo -e "Host github.com-frontend\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_rsa_3\n" >> ~/.ssh/config
 
-      - name: Checkout all repos
-        run: |
-          git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git greencity-backcore-roman-98
-          git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git greencity-backuser-roman-98
-          git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git greencity-frontend-roman-98
+      - name: Checkout backcore repo
+      run: |
+        git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git greencity-backcore-roman-98
+
+    - name: Checkout backuser repo
+      run: |
+        git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git greencity-backuser-roman-98
+
+    - name: Checkout frontend repo
+      run: |
+        git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git greencity-frontend-roman-98
 
       - name: Cache repos
         uses: actions/cache@v2
