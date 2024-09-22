@@ -10,7 +10,7 @@ jobs:
   Plan:
     uses: roman-98/greencity-devops/.github/workflows/aws_tf_plan.yml@tf-changes
     with:
-      gh_environment: dev
+      gh_environment: Terraform
     secrets:
       cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
 
@@ -18,6 +18,6 @@ jobs:
     needs: Plan
     uses: roman-98/greencity-devops/.github/workflows/aws_tf_apply.yml@tf-changes
     with:
-      gh_environment: dev
+      gh_environment: Terraform
     secrets:
       cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
