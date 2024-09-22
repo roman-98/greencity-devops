@@ -41,7 +41,7 @@ jobs:
             ${{ runner.os }}-ssh-
 
   clone_repositories:
-    name: Clone Repositories
+    name: Clone Repository
     needs: setup
     runs-on: ubuntu-latest
     strategy:
@@ -63,7 +63,7 @@ jobs:
           key: ${{ runner.os }}-repo-${{ matrix.repo }}-${{ github.sha }}
 
   build_and_push:
-    name: Build and Push ${{ matrix.component }}
+    name: Build and Push 
     needs: clone_repositories
     runs-on: ubuntu-latest
     strategy:
