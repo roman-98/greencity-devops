@@ -98,3 +98,20 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/greencity-${{ matrix.component }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+  notify:
+    name: Notify on completion
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Workflow completed for *${{ github.workflow }}*.
+            Status: *${{ job.status }}*
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Triggered by: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_CI }}
+        if: always()
