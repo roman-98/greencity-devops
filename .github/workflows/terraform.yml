@@ -9,13 +9,15 @@ on:
 jobs:
   Plan:
     uses: roman-98/greencity-devops/.github/workflows/aws_tf_plan.yml@tf-changes
-    environment: Terraform
+    with:
+      gh_environment: Terraform
     secrets:
       cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
 
   Apply:
     needs: Plan
     uses: roman-98/greencity-devops/.github/workflows/aws_tf_apply.yml@tf-changes
-    environment: Terraform
+    with:
+      gh_environment: Terraform
     secrets:
       cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
