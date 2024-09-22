@@ -79,7 +79,8 @@ jobs:
 
       - name: Build Backcore image
         run: |
-          docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
+          cd greencity-backcore-roman-98
+          docker build . -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
 
   push_backcore:
     runs-on: ubuntu-latest
@@ -109,7 +110,8 @@ jobs:
 
       - name: Build Backuser image
         run: |
-          docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }}
+          cd greencity-backuser-roman-98
+          docker build . -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }}
 
   push_backuser:
     runs-on: ubuntu-latest
@@ -139,7 +141,8 @@ jobs:
 
       - name: Build Frontend image
         run: |
-          docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
+          cd greencity-frontend-roman-98
+          docker build . -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
 
   push_frontend:
     runs-on: ubuntu-latest
