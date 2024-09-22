@@ -67,7 +67,7 @@ jobs:
       - name: Checkout frontend repo
         run: git clone git@github.com-frontend:DevOps-ProjectLevel/greencity-frontend-roman-98.git greencity-frontend-roman-98
 
-  build_backcore:
+   build_and_push_backcore:
     runs-on: ubuntu-latest
     needs: checkout_backcore
     steps:
@@ -77,28 +77,13 @@ jobs:
       - name: Set version for Backcore
         run: echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-      - name: Build Backcore image
+      - name: Build and push Backcore image
         run: |
-          cd greencity-backcore-roman-98
-          docker build . -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
-
-  push_backcore:
-    runs-on: ubuntu-latest
-    needs: build_backcore
-    steps:
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Push Backcore image
-        run: |
+          docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
 
-  build_backuser:
+  build_and_push_backuser:
     runs-on: ubuntu-latest
     needs: checkout_backuser
     steps:
@@ -108,28 +93,13 @@ jobs:
       - name: Set version for Backuser
         run: echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-      - name: Build Backuser image
+      - name: Build and push Backuser image
         run: |
-          cd greencity-backuser-roman-98
-          docker build . -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }}
-
-  push_backuser:
-    runs-on: ubuntu-latest
-    needs: build_backuser
-    steps:
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Push Backuser image
-        run: |
+          docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:latest
 
-  build_frontend:
+  build_and_push_frontend:
     runs-on: ubuntu-latest
     needs: checkout_frontend
     steps:
@@ -139,23 +109,8 @@ jobs:
       - name: Set version for Frontend
         run: echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-      - name: Build Frontend image
+      - name: Build and push Frontend image
         run: |
-          cd greencity-frontend-roman-98
-          docker build . -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
-
-  push_frontend:
-    runs-on: ubuntu-latest
-    needs: build_frontend
-    steps:
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Push Frontend image
-        run: |
+          docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:latest
