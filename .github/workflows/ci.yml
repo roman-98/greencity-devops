@@ -116,7 +116,7 @@ jobs:
           echo -e "Host github.com-backuser\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/id_backuser\n" >> ~/.ssh/config
 
       - name: Clone backuser repo
-        run: git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git
+        run: git clone git@github.com-backuser:DevOps-ProjectLevel/greencity-backuser-roman-98.git greencity-backuser-roman-98
 
       - name: Cache cloned backuser repo
         uses: actions/cache@v3
