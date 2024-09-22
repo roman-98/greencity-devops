@@ -92,8 +92,8 @@ jobs:
     steps:
     - name: Build and push backcore image
       run: |
-        docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
-        docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
+        docker build ./greencity-backcore-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION -t ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:$VERSION
         docker push ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
 
   build-push-backuser:
@@ -103,8 +103,8 @@ jobs:
     steps:
     - name: Build and push backuser image
       run: |
-        docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:latest
-        docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:${{ env.VERSION }}
+        docker build ./greencity-backuser-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:$VERSION -t ghcr.io/${{ github.repository_owner }}/greencity-backuser:latest
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:$VERSION
         docker push ghcr.io/${{ github.repository_owner }}/greencity-backuser:latest
 
   build-push-frontend:
@@ -114,6 +114,6 @@ jobs:
     steps:
     - name: Build and push frontend image
       run: |
-        docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }} -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:latest
-        docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:${{ env.VERSION }}
+        docker build ./greencity-frontend-roman-98 -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:$VERSION -t ghcr.io/${{ github.repository_owner }}/greencity-frontend:latest
+        docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:$VERSION
         docker push ghcr.io/${{ github.repository_owner }}/greencity-frontend:latest
