@@ -14,12 +14,3 @@ output "region" {
   value = var.aws_region
 }
 
-output "cluster_id" {
-  description = "EKS cluster ID."
-  value       = module.eks.cluster_id
-}
-
-output "rds_endpoint" {
-  description = "RDS endpoint."
-  value       = module.rds.endpoint
-}
