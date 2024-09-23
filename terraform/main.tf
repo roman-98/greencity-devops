@@ -1,22 +1,10 @@
-provider "aws" {
-  region = var.aws_region
-}
-
 data "aws_availability_zones" "available" {}
-
-locals {
-  cluster_name = "abhi-eks-${random_string.suffix.result}"
-}
-
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-}
 
 module "vpc" {
   source = "./modules/vpc"
-  vpc_cidr = var.vpc_cidr
-  azs = data.aws_availability_zones.available.names
+
+  vpc_cidr     = var.vpc_cidr  # Передаємо CIDR
+  azs          = data.aws_availability_zones.available.names  # Передаємо AZs
   cluster_name = local.cluster_name
 }
 
@@ -26,24 +14,34 @@ module "eks" {
   kubernetes_version = var.kubernetes_version
   vpc_id            = module.vpc.vpc_id
   private_subnets   = module.vpc.private_subnets
+  security_group    = aws_security_group.all_worker_mgmt.id
 }
 
-module "rds" {
-  source        = "./modules/rds"
-  db_instance_identifier = "${local.cluster_name}-db"
-  db_username   = var.db_username
-  db_password   = var.db_password
-  db_name       = var.db_name
-  vpc_security_group_ids = module.vpc.db_security_group_ids
-  subnet_ids    = module.vpc.private_subnets
+resource "aws_security_group" "all_worker_mgmt" {
+  name_prefix = "all_worker_management"
+  vpc_id      = module.vpc.vpc_id
 }
 
-output "cluster_id" {
-  description = "EKS cluster ID."
-  value       = module.eks.cluster_id
+resource "aws_security_group_rule" "all_worker_mgmt_ingress" {
+  description       = "allow inbound traffic from eks"
+  from_port         = 0
+  protocol          = "-1"
+  to_port           = 0
+  security_group_id = aws_security_group.all_worker_mgmt.id
+  type              = "ingress"
+  cidr_blocks = [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16",
+  ]
 }
 
-output "rds_endpoint" {
-  description = "RDS endpoint."
-  value       = module.rds.endpoint
+resource "aws_security_group_rule" "all_worker_mgmt_egress" {
+  description       = "allow outbound traffic to anywhere"
+  from_port         = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.all_worker_mgmt.id
+  to_port           = 0
+  type              = "egress"
+  cidr_blocks       = ["0.0.0.0/0"]
 }

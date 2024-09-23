@@ -43,4 +43,15 @@ provider "kubernetes" {
 }
 */
 
+provider "aws" {
+  region = "eu-west-3"
+}
 
+locals {
+  cluster_name = "abhi-eks-${random_string.suffix.result}"
+}
+
+resource "random_string" "suffix" {
+  length  = 5
+  special = false
+}

@@ -1,55 +1,28 @@
-resource "aws_vpc" "main" {
-  cidr_block = var.vpc_cidr
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+  version = "5.7.0"
+
+  name                 = var.cluster_name
+  cidr                 = var.vpc_cidr
+  azs                  = var.azs  # Передаємо AZs як змінну
+  private_subnets      = ["10.0.1.0/24", "10.0.2.0/24"]
+  public_subnets       = ["10.0.4.0/24", "10.0.5.0/24"]
+  enable_nat_gateway   = true
+  single_nat_gateway   = true
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 
   tags = {
-    Name = "${var.cluster_name}-vpc"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
-}
 
-resource "aws_subnet" "private" {
-  count = length(var.azs)
-
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 1)  # Зміна на +1 для унікальних блоків
-  availability_zone = var.azs[count.index]
-
-  tags = {
-    Name = "${var.cluster_name}-private-${count.index}"
+  public_subnet_tags = {
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                    = "1"
   }
-}
 
-resource "aws_subnet" "public" {
-  count = length(var.azs)
-
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 1 + length(var.azs))  # Зміна на +1 +length(var.azs)
-  availability_zone = var.azs[count.index]
-
-  tags = {
-    Name = "${var.cluster_name}-public-${count.index}"
+  private_subnet_tags = {
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"           = "1"
   }
-}
-
-resource "aws_security_group" "db" {
-  vpc_id = aws_vpc.main.id
-
-  tags = {
-    Name = "${var.cluster_name}-db-sg"
-  }
-}
-
-output "vpc_id" {
-  value = aws_vpc.main.id
-}
-
-output "private_subnets" {
-  value = aws_subnet.private[*].id
-}
-
-output "public_subnets" {
-  value = aws_subnet.public[*].id
-}
-
-output "db_security_group_ids" {
-  value = [aws_security_group.db.id]
 }

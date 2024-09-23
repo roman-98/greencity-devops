@@ -13,4 +13,3 @@ output "eks_cluster_endpoint" {
 output "region" {
   value = var.aws_region
 }
-
