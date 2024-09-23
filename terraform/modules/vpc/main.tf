@@ -10,7 +10,7 @@ resource "aws_subnet" "private" {
   count = length(var.azs)
 
   vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index)
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 1)  # Зміна на +1 для унікальних блоків
   availability_zone = var.azs[count.index]
 
   tags = {
@@ -22,7 +22,7 @@ resource "aws_subnet" "public" {
   count = length(var.azs)
 
   vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 1)
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 1 + length(var.azs))  # Зміна на +1 +length(var.azs)
   availability_zone = var.azs[count.index]
 
   tags = {
@@ -44,6 +44,10 @@ output "vpc_id" {
 
 output "private_subnets" {
   value = aws_subnet.private[*].id
+}
+
+output "public_subnets" {
+  value = aws_subnet.public[*].id
 }
 
 output "db_security_group_ids" {
