@@ -17,6 +17,14 @@ module "eks" {
   security_group    = aws_security_group.all_worker_mgmt.id
 }
 
+module "db_subnet_group" {
+  source  = "terraform-aws-modules/rds/aws//modules/db_subnet_group"
+  version = "5.6.0"
+
+  name       = "my-db-subnet-group"
+  subnet_ids = module.vpc.private_subnets
+}
+
 resource "aws_security_group" "all_worker_mgmt" {
   name_prefix = "all_worker_management"
   vpc_id      = module.vpc.vpc_id
