@@ -1,17 +1,20 @@
-module "vpc" {
-  source  = "./modules/vpc/"
+data "aws_availability_zones" "available" {}
 
-  vpc_cidr            = var.vpc_cidr
-  cluster_name        = local.cluster_name
+module "vpc" {
+  source = "./modules/vpc"
+
+  vpc_cidr     = var.vpc_cidr  # Передаємо CIDR
+  azs          = data.aws_availability_zones.available.names  # Передаємо AZs
+  cluster_name = local.cluster_name
 }
 
 module "eks" {
-  source          = "./modules/eks/"
-  cluster_name    = local.cluster_name
+  source            = "./modules/eks"
+  cluster_name      = local.cluster_name
   kubernetes_version = var.kubernetes_version
-  vpc_id          = module.vpc.vpc_id
-  private_subnets = module.vpc.private_subnets
-  security_group  = aws_security_group.all_worker_mgmt.id
+  vpc_id            = module.vpc.vpc_id
+  private_subnets   = module.vpc.private_subnets
+  security_group    = aws_security_group.all_worker_mgmt.id
 }
 
 resource "aws_security_group" "all_worker_mgmt" {

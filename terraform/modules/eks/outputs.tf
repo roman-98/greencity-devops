@@ -1,7 +1,9 @@
 output "cluster_id" {
-  value = module.eks.cluster_id
+  description = "ID кластера EKS"
+  value       = module.eks.cluster_id
 }
 
 output "cluster_endpoint" {
-  value = module.eks.cluster_endpoint
+  description = "Endpoint для керування EKS"
+  value       = module.eks.cluster_endpoint
 }

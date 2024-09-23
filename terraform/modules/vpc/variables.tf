@@ -1,9 +1,14 @@
 variable "vpc_cidr" {
-  description = "CIDR block for VPC"
+  description = "CIDR діапазон для VPC"
   type        = string
 }
 
+variable "azs" {
+  description = "Список доступних зон"
+  type        = list(string)
+}
+
 variable "cluster_name" {
-  description = "Name of the EKS cluster"
+  description = "Назва кластера EKS"
   type        = string
 }
