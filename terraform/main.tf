@@ -27,13 +27,13 @@ module "eks" {
 
 
 module "rds" {
-  source        = "./modules/rds"
-  db_instance_identifier = "${local.cluster_name}-db"
-  db_username   = var.db_username
-  db_password   = var.db_password
-  db_name       = var.db_name
-  vpc_security_group_ids = module.vpc.db_security_group_ids
-  subnet_ids    = module.vpc.private_subnets
+  source                  = "./modules/rds"
+  db_instance_identifier  = "my-db-instance"
+  db_username             = var.db_username
+  db_password             = var.db_password
+  db_name                 = var.db_name
+  db_subnet_ids           = module.vpc.private_subnets  # Передаємо приватні підмережі
+  vpc_security_group_ids   = module.vpc.db_security_group_ids  # Передаємо групу безпеки
 }
 
 output "cluster_id" {
