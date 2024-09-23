@@ -25,7 +25,3 @@ resource "aws_db_subnet_group" "default" {
     Name = "${var.db_instance_identifier}-subnet-group"
   }
 }
-
-output "endpoint" {
-  value = aws_db_instance.default.endpoint
-}
