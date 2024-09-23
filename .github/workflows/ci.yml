@@ -101,7 +101,7 @@ jobs:
 
   notify:
     name: Notify on completion
-    needs: Apply
+    needs: build_and_push
     runs-on: ubuntu-latest
     steps:
       - uses: 8398a7/action-slack@v3
