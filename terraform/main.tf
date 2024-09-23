@@ -1,3 +1,7 @@
+provider "aws" {
+  region = var.aws_region
+}
+
 data "aws_availability_zones" "available" {}
 
 locals {
@@ -22,18 +26,16 @@ module "eks" {
   kubernetes_version = var.kubernetes_version
   vpc_id            = module.vpc.vpc_id
   private_subnets   = module.vpc.private_subnets
-  vpc_security_group_ids = module.vpc.db_security_group_ids  # Передаємо групи безпеки
 }
 
-
 module "rds" {
-  source                  = "./modules/rds"
-  db_instance_identifier  = "my-db-instance"
-  db_username             = var.db_username
-  db_password             = var.db_password
-  db_name                 = var.db_name
-  db_subnet_ids           = module.vpc.private_subnets  # Передаємо приватні підмережі
-  vpc_security_group_ids   = module.vpc.db_security_group_ids  # Передаємо групу безпеки
+  source        = "./modules/rds"
+  db_instance_identifier = "${local.cluster_name}-db"
+  db_username   = var.db_username
+  db_password   = var.db_password
+  db_name       = var.db_name
+  vpc_security_group_ids = module.vpc.db_security_group_ids
+  subnet_ids    = module.vpc.private_subnets
 }
 
 output "cluster_id" {
@@ -42,7 +44,6 @@ output "cluster_id" {
 }
 
 output "rds_endpoint" {
-  description = "The connection endpoint for the RDS instance."
+  description = "RDS endpoint."
   value       = module.rds.endpoint
 }
-

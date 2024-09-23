@@ -13,6 +13,7 @@ variable "cluster_name" {
   type        = string
 }
 
+
 variable "private_subnets" {
   description = "List of private subnet CIDR blocks"
   type        = list(string)

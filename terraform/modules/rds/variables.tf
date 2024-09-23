@@ -1,15 +1,15 @@
 variable "db_instance_identifier" {
-  description = "Ідентифікатор екземпляра бази даних"
+  description = "Ідентифікатор DB екземпляра"
   type        = string
 }
 
 variable "db_username" {
-  description = "Ім'я користувача для бази даних"
+  description = "Ім'я користувача для доступу до бази даних"
   type        = string
 }
 
 variable "db_password" {
-  description = "Пароль для бази даних"
+  description = "Пароль для доступу до бази даних"
   type        = string
 }
 
@@ -18,12 +18,12 @@ variable "db_name" {
   type        = string
 }
 
-variable "db_subnet_ids" {
-  description = "Список ID підмереж для RDS"
-  type        = list(string)  # Це потрібно для підмережі бази даних
-}
-
 variable "vpc_security_group_ids" {
   description = "Список ID груп безпеки для RDS"
-  type        = list(string)  # Це потрібно для групи безпеки
+  type        = list(string)
+}
+
+variable "subnet_ids" {
+  description = "Список підмереж для RDS"
+  type        = list(string)
 }

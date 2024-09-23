@@ -17,8 +17,3 @@ variable "vpc_id" {
   description = "ID VPC"
   type        = string
 }
-
-variable "vpc_security_group_ids" {
-  description = "Список ID груп безпеки для EKS"
-  type        = list(string)
-}

@@ -17,7 +17,6 @@ module "eks" {
   eks_managed_node_group_defaults = {
     ami_type               = "AL2_x86_64"
     instance_types         = ["t3.medium"]
-    vpc_security_group_ids = var.vpc_security_group_ids  # Тут ми використовуємо vpc_security_group_ids
   }
 
   eks_managed_node_groups = {
