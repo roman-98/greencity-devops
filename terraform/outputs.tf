@@ -16,6 +16,6 @@ output "region" {
 
 output "rds_endpoint" {
   description = "PostgreSQL RDS endpoint"
-  value       = module.rds.db_instance_endpoint
+  value       = module.rds_endpoint
 }
 
