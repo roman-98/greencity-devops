@@ -21,31 +21,3 @@ jobs:
       gh_environment: Terraform
     secrets:
       cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
-
-  notify:
-    name: Notify on completion
-    needs: Apply
-    runs-on: ubuntu-latest
-    steps:
-      - uses: 8398a7/action-slack@v3
-        with:
-          fields: workflow,job,commit,repo,ref,author,took
-          status: ${{ job.status }}
-          text: |
-            *Workflow*: ${{ github.workflow }}
-            *Status*: ${{ job.status }}
-            *Repository*: ${{ github.repository }}
-            *Branch*: ${{ github.ref_name }}
-            *Commit*: ${{ github.sha }} - ${{ github.event.head_commit.message }}
-            *Author*: ${{ github.actor }}
-            *Event*: ${{ github.event_name }}
-            *Run ID*: ${{ github.run_id }}
-            *Job ID*: ${{ github.job }}
-            *Workflow URL*: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            *Time of Completion*: ${{ steps.time.outputs.timestamp }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: always()
-      - name: Get timestamp
-        id: time
-        run: echo "timestamp=$(date -u)" >> $GITHUB_ENV    
