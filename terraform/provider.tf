@@ -47,6 +47,12 @@ provider "aws" {
   region = "eu-west-3"
 }
 
+data "aws_availability_zones" "available" {}
+
+locals {
+  cluster_name = "abhi-eks-${random_string.suffix.result}"
+}
+
 resource "random_string" "suffix" {
   length  = 5
   special = false

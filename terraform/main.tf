@@ -1,28 +1,44 @@
-module "eks" {
-  source                  = "./modules/eks"
-  aws_public_subnet       = module.vpc.aws_public_subnet
-  vpc_id                  = module.vpc.vpc_id
-  cluster_name            = "module-eks-${random_string.suffix.result}"
-  endpoint_public_access  = true
-  endpoint_private_access = false
-  public_access_cidrs     = ["0.0.0.0/0"]
-  node_group_name         = "greencity"
-  scaling_desired_size    = 1
-  scaling_max_size        = 1
-  scaling_min_size        = 1
-  instance_types          = ["t3.medium"]
-  key_pair                = "TestKeyPair"
+module "vpc" {
+  source  = "./modules/vpc/"
+
+  vpc_cidr            = var.vpc_cidr
+  cluster_name        = local.cluster_name
 }
 
-module "vpc" {
-  source                  = "./modules/vpc"
-  tags                    = "greencity"
-  instance_tenancy        = "default"
-  vpc_cidr                = "10.0.0.0/16"
-  access_ip               = "0.0.0.0/0"
-  public_sn_count         = 2
-  public_cidrs            = ["10.0.1.0/24", "10.0.2.0/24"]
-  map_public_ip_on_launch = true
-  rt_route_cidr_block     = "0.0.0.0/0"
+module "eks" {
+  source          = "./modules/eks/"
+  cluster_name    = local.cluster_name
+  kubernetes_version = var.kubernetes_version
+  vpc_id          = module.vpc.vpc_id
+  private_subnets = module.vpc.private_subnets
+  security_group  = aws_security_group.all_worker_mgmt.id
+}
 
+resource "aws_security_group" "all_worker_mgmt" {
+  name_prefix = "all_worker_management"
+  vpc_id      = module.vpc.vpc_id
+}
+
+resource "aws_security_group_rule" "all_worker_mgmt_ingress" {
+  description       = "allow inbound traffic from eks"
+  from_port         = 0
+  protocol          = "-1"
+  to_port           = 0
+  security_group_id = aws_security_group.all_worker_mgmt.id
+  type              = "ingress"
+  cidr_blocks = [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16",
+  ]
+}
+
+resource "aws_security_group_rule" "all_worker_mgmt_egress" {
+  description       = "allow outbound traffic to anywhere"
+  from_port         = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.all_worker_mgmt.id
+  to_port           = 0
+  type              = "egress"
+  cidr_blocks       = ["0.0.0.0/0"]
 }

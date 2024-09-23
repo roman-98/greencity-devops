@@ -1,18 +1,9 @@
-variable "vpc_cidr" {}
-variable "access_ip" {}
-variable "public_sn_count" {}
-variable "public_cidrs" {
-  type = list(any)
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
+  type        = string
 }
-variable "instance_tenancy" {
 
-}
-variable "tags" {
-
-}
-variable "map_public_ip_on_launch" {
-
-}
-variable "rt_route_cidr_block" {
-
+variable "cluster_name" {
+  description = "Name of the EKS cluster"
+  type        = string
 }
