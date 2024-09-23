@@ -1,6 +1,6 @@
 resource "aws_db_subnet_group" "default" {
   name       = "${var.db_instance_identifier}-subnet-group"
-  subnet_ids = var.db_subnet_ids  # Переконайтеся, що передаєте правильні підмережі
+  subnet_ids = var.db_subnet_ids
 
   tags = {
     Name = "${var.db_instance_identifier}-subnet-group"
@@ -14,7 +14,7 @@ resource "aws_db_instance" "default" {
   instance_class       = "db.t3.micro"
   allocated_storage     = 20
   db_subnet_group_name = aws_db_subnet_group.default.name
-  vpc_security_group_ids = var.vpc_security_group_ids  # Групи безпеки для RDS
+  vpc_security_group_ids = var.vpc_security_group_ids
   username             = var.db_username
   password             = var.db_password
   db_name              = var.db_name
@@ -24,4 +24,9 @@ resource "aws_db_instance" "default" {
   tags = {
     Name = "${var.db_instance_identifier}-instance"
   }
+}
+
+output "endpoint" {
+  description = "The connection endpoint for the database."
+  value       = aws_db_instance.default.endpoint
 }

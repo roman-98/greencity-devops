@@ -42,6 +42,7 @@ output "cluster_id" {
 }
 
 output "rds_endpoint" {
-  description = "RDS endpoint."
+  description = "The connection endpoint for the RDS instance."
   value       = module.rds.endpoint
 }
+
