@@ -1,14 +1,32 @@
-variable "vpc_cidr" {
-  default     = "10.0.0.0/16"
-  description = "CIDR для VPC"
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-west-1"
 }
 
-variable "aws_region" {
-  default     = "us-west-1"
-  description = "Регіон AWS"
+variable "vpc_cidr" {
+  description = "CIDR діапазон для VPC"
+  type        = string
+  default     = "10.0.0.0/16"
 }
 
 variable "kubernetes_version" {
+  description = "версія Kubernetes"
+  type        = string
   default     = "1.27"
-  description = "Версія Kubernetes для EKS"
+}
+
+variable "db_username" {
+  description = "Ім'я користувача для бази даних"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Пароль для бази даних"
+  type        = string
+}
+
+variable "db_name" {
+  description = "Назва бази даних"
+  type        = string
 }

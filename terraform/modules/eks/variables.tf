@@ -4,21 +4,21 @@ variable "cluster_name" {
 }
 
 variable "kubernetes_version" {
-  description = "Версія Kubernetes"
-  type        = string
-}
-
-variable "vpc_id" {
-  description = "ID VPC, де буде розгорнуто EKS"
-  type        = string
+  default     = 1.27
+  description = "версія Kubernetes"
 }
 
 variable "private_subnets" {
-  description = "Приватні підмережі в VPC"
+  description = "Список приватних підмереж"
   type        = list(string)
 }
 
-variable "security_group" {
-  description = "Security group для EKS"
+variable "vpc_id" {
+  description = "ID VPC"
   type        = string
+}
+
+variable "vpc_security_group_ids" {
+  description = "Список ID груп безпеки для EKS"
+  type        = list(string)
 }
