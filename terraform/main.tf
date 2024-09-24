@@ -76,13 +76,15 @@ module "rds" {
   engine             = "postgres"
   engine_version     = "13.4"
   instance_class     = "db.t3.medium"
-  allocated_storage  = 20
+  allocated_storage   = 20
   storage_type       = "gp2"
   username           = "admin"
   password           = random_password.rds_password.result
   multi_az           = true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  db_subnet_group_name   = module.db_subnet_group.id
+  
+  # Використовуйте id для db_subnet_group_name
+  db_subnet_group_name   = module.db_subnet_group.id  # Тепер це повинно працювати
 
   subnet_ids = module.vpc.private_subnets
 
@@ -90,6 +92,7 @@ module "rds" {
     Name = "my-postgres-db"
   }
 }
+
 
 output "rds_endpoint" {
   description = "PostgreSQL RDS endpoint"
