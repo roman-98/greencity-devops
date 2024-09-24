@@ -2,16 +2,24 @@ data "aws_availability_zones" "available" {}
 
 resource "aws_vpc" "this" {
   cidr_block = var.cidr_block
+  
+  tags = {
+    Name = "my-vpc"
+  }
 }
 
 resource "aws_subnet" "private" {
-  count = length(var.azs)
-  
+  count = length(var.private_subnets)  # Використовуйте кількість підмереж
+
   vpc_id            = aws_vpc.this.id
-  cidr_block        = [var.private_subnets]
+  cidr_block        = element(var.private_subnets, count.index)  # Отримайте окремий CIDR блок
   availability_zone = element(var.azs, count.index)
-  
+
   map_public_ip_on_launch = false
+  
+  tags = {
+    Name = "Private Subnet ${count.index + 1}"
+  }
 }
 
 resource "aws_security_group" "private_sg" {
@@ -23,7 +31,7 @@ resource "aws_security_group" "private_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24", "10.0.2.0/24"]
+    cidr_blocks = ["10.0.1.0/24", "10.0.2.0/24"]  # Переконайтеся, що це коректно
   }
 
   egress {
