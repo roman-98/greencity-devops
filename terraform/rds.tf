@@ -5,7 +5,7 @@ resource "aws_db_instance" "my_db" {
   instance_class         = "db.t3.micro"
   allocated_storage       = 20
   storage_type           = "gp2"
-  username               = "admin"
+  username               = "postgres"
   password               = "yourpassword"  # Змініть на сильний пароль
   db_name                = "mydb"
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
