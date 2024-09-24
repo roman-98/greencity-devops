@@ -75,9 +75,6 @@ module "rds" {
   multi_az           = true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   
-  # Використовуйте id для db_subnet_group_name
-  db_subnet_group_name   = module.db_subnet_group.id  # Тепер це повинно працювати
-
   subnet_ids = module.vpc.private_subnets
 
   tags = {
