@@ -55,10 +55,6 @@ resource "aws_eks_node_group" "my_eks_node_group" {
 
   disk_size = 20  # Розмір диска на нодах
 
-  remote_access {
-    ec2_ssh_key = "my-key"  # Ваш SSH ключ для доступу до нод
-  }
-
   tags = {
     Name = "my_eks_node_group"
   }
