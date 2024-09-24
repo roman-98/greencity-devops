@@ -14,12 +14,4 @@ output "region" {
   value = var.aws_region
 }
 
-output "rds_cluster_endpoint" {
-  description = "The cluster endpoint"
-  value       = aws_rds_cluster.postgresql.endpoint
-}
 
-output "rds_cluster_reader_endpoint" {
-  description = "The cluster reader endpoint"
-  value       = aws_rds_cluster.postgresql.reader_endpoint
-}
