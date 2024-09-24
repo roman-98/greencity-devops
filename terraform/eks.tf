@@ -51,19 +51,19 @@ resource "aws_eks_node_group" "my_eks_node_group" {
     min_size     = 1  # Мінімальна кількість нод для автоскейлінгу
   }
 
-  instance_types = ["t3.medium"]  # Тип інстансів для воркер-нод
-  
-  ami_type = "AL2_x86_64"  # Amazon Linux 2 для x86 архітектури
-
-#  remote_access {
-#    ec2_ssh_key = "my-key-pair"  # SSH ключ для доступу до EC2 інстансів
-#  }
+  update_config {
+    max_unavailable = 1
+  }
 
   tags = {
     Name = "my_eks_node_group"
   }
 
-  depends_on = [aws_iam_role_policy_attachment.eks_AmazonEKSWorkerNodePolicy]
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_AmazonEKSWorkerNodePolicy,
+    aws_iam_role_policy_attachment.eks_AmazonEKS_CNI_Policy,
+    aws_iam_role_policy_attachment.eks_AmazonEC2ContainerRegistryReadOnly,
+  ]
 }
 
 # IAM роль для воркер-нод
@@ -71,15 +71,14 @@ resource "aws_iam_role" "eks_node_role" {
   name = "eks_node_role"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
     Statement = [{
-      Action    = "sts:AssumeRole"
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
       Principal = {
         Service = "ec2.amazonaws.com"
       }
-      Effect    = "Allow"
-      Sid       = ""
     }]
+    Version = "2012-10-17"
   })
 }
 
