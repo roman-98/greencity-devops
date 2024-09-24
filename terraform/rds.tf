@@ -1,7 +1,7 @@
 resource "aws_db_instance" "my_db" {
   identifier              = "my-database"
   engine                 = "postgres"  # Змініть на "mysql" для MySQL
-  engine_version         = "15.2"  # Змініть на актуальну версію
+  engine_version         = "16"  # Змініть на актуальну версію
   instance_class         = "db.t3.micro"
   allocated_storage       = 20
   storage_type           = "gp2"
