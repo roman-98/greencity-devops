@@ -1,95 +1,92 @@
-data "aws_availability_zones" "available" {}
-
+# VPC Module
 module "vpc" {
   source = "./modules/vpc"
-
-  vpc_cidr     = var.vpc_cidr  # Передаємо CIDR
-  azs          = data.aws_availability_zones.available.names  # Передаємо AZs
-  cluster_name = local.cluster_name
+  
+  cidr_block = "10.0.0.0/16"
+  azs        = ["us-west-2a", "us-west-2b"]
 }
 
+# IAM Role for EKS Cluster
+resource "aws_iam_role" "eks_cluster_role" {
+  name = "eks-cluster-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "eks.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cluster_role_policy" {
+  role       = aws_iam_role.eks_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
+
+# IAM Role for EKS Worker Nodes
+resource "aws_iam_role" "eks_node_role" {
+  name = "eks-node-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_node_role_policy" {
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+}
+
+resource "aws_iam_role_policy_attachment" "eks_ec2_policy" {
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+# EKS Module
 module "eks" {
-  source            = "./modules/eks"
-  cluster_name      = local.cluster_name
-  kubernetes_version = var.kubernetes_version
+  source = "./modules/eks"
+  
+  vpc_id           = module.vpc.vpc_id
+  private_subnets  = module.vpc.private_subnets
+  cluster_name     = "my-eks-cluster"
+  instance_type    = "t3.medium"
+  cluster_role_arn = aws_iam_role.eks_cluster_role.arn
+  node_role_arn    = aws_iam_role.eks_node_role.arn
+}
+
+# RDS Module
+module "rds" {
+  source = "./modules/rds"
+  
   vpc_id            = module.vpc.vpc_id
   private_subnets   = module.vpc.private_subnets
-  security_group    = aws_security_group.all_worker_mgmt.id
+  db_identifier     = "my-db"
+  db_instance_class = "db.t3.medium"
+  db_name           = "mydatabase"
+  db_user           = "admin"
+  db_password       = "password123"
 }
 
-resource "aws_security_group" "all_worker_mgmt" {
-  name_prefix = "all_worker_management"
-  vpc_id      = module.vpc.vpc_id
+output "eks_cluster_endpoint" {
+  value = module.eks.cluster_endpoint
 }
-
-resource "aws_security_group_rule" "all_worker_mgmt_ingress" {
-  description       = "allow inbound traffic from eks"
-  from_port         = 0
-  protocol          = "-1"
-  to_port           = 0
-  security_group_id = aws_security_group.all_worker_mgmt.id
-  type              = "ingress"
-  cidr_blocks = [
-    "10.0.0.0/8",
-    "172.16.0.0/12",
-    "192.168.0.0/16",
-  ]
-}
-
-resource "aws_security_group_rule" "all_worker_mgmt_egress" {
-  description       = "allow outbound traffic to anywhere"
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = aws_security_group.all_worker_mgmt.id
-  to_port           = 0
-  type              = "egress"
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
-resource "random_password" "rds_password" {
-  length  = 16
-  special = true
-}
-
-resource "aws_security_group" "rds_sg" {
-  name_prefix = "rds_security_group"
-  vpc_id      = module.vpc.vpc_id
-
-  tags = {
-    Name = "rds_security_group"
-  }
-}
-
-module "rds" {
-  source  = "terraform-aws-modules/rds/aws"
-  version = "5.6.0"
-
-  identifier         = "my-postgres-db"
-  engine             = "postgres"
-  engine_version     = "13.4"
-  instance_class     = "db.t3.medium"
-  allocated_storage   = 20
-  storage_type       = "gp2"
-  username           = "admin"
-  password           = random_password.rds_password.result
-  multi_az           = true
-  vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  
-  subnet_ids = module.vpc.private_subnets
-
-  tags = {
-    Name = "my-postgres-db"
-  }
-}
-
 
 output "rds_endpoint" {
-  description = "PostgreSQL RDS endpoint"
-  value       = module.rds.db_instance_endpoint
-}
-
-output "rds_password" {
-  description = "Пароль для PostgreSQL RDS"
-  value       = random_password.rds_password.result
-  sensitive   = true
+  value = module.rds.db_endpoint
 }

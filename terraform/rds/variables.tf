@@ -1,9 +1,27 @@
-variable "db_parameter_group_name" {
-  description = "Name of the DB parameter group"
-  type        = string
+variable "vpc_id" {
+  type = string
 }
 
-variable "family" {
-  description = "The DB parameter group family"
-  type        = string
+variable "private_subnets" {
+  type = list(string)
+}
+
+variable "db_identifier" {
+  type = string
+}
+
+variable "db_instance_class" {
+  type = string
+}
+
+variable "db_name" {
+  type = string
+}
+
+variable "db_user" {
+  type = string
+}
+
+variable "db_password" {
+  type = string
 }

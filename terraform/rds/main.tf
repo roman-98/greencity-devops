@@ -1,43 +1,30 @@
-module "rds" {
-  source  = "terraform-aws-modules/rds/aws"
-  version = "5.6.0"
-
-  identifier         = "my-postgres-db"
-  engine             = "postgres"
-  engine_version     = "13.4"
-  instance_class     = "db.t3.medium"
-  allocated_storage  = 20
-  storage_type       = "gp2"
-  username           = "admin"
-  password           = random_password.rds_password.result
-  multi_az           = true
+resource "aws_db_instance" "this" {
+  identifier        = var.db_identifier
+  instance_class    = var.db_instance_class
+  allocated_storage = 20
+  engine            = "mysql"
+  engine_version    = "8.0"
+  username          = var.db_user
+  password          = var.db_password
+  db_name           = var.db_name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
-
-  family = "postgres13"  
-
-  # Підмережі для Multi-AZ
-  subnet_ids = module.vpc.private_subnets
-
-  tags = {
-    Name = "my-postgres-db"
-  }
 }
 
-resource "random_password" "rds_password" {
-  length  = 16
-  special = true
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  name       = "rds-subnet-group"
+  subnet_ids = var.private_subnets
 }
 
-# Security group for RDS
 resource "aws_security_group" "rds_sg" {
-  name   = "rds-postgres-sg"
-  vpc_id = module.vpc.vpc_id
+  name        = "rds-sg"
+  description = "RDS Security Group"
+  vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 5432
-    to_port     = 5432
+    from_port   = 3306
+    to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"]
+    cidr_blocks = [module.vpc.cidr_block]
   }
 
   egress {
@@ -48,3 +35,6 @@ resource "aws_security_group" "rds_sg" {
   }
 }
 
+output "db_endpoint" {
+  value = aws_db_instance.this.endpoint
+}

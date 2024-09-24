@@ -1,29 +1,27 @@
-module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
-  version         = "20.8.4"
-  cluster_name    = var.cluster_name
-  cluster_version = var.kubernetes_version
+resource "aws_eks_cluster" "this" {
+  name     = var.cluster_name
+  role_arn = var.cluster_role_arn
+
+  vpc_config {
+    subnet_ids = var.private_subnets
+  }
+}
+
+resource "aws_eks_node_group" "this" {
+  cluster_name    = aws_eks_cluster.this.name
+  node_group_name = "${var.cluster_name}-node-group"
+  node_role_arn   = var.node_role_arn
   subnet_ids      = var.private_subnets
 
-  enable_irsa = true
-
-  tags = {
-    cluster = "demo"
+  scaling_config {
+    desired_size = 2
+    max_size     = 3
+    min_size     = 1
   }
 
-  vpc_id = var.vpc_id
+  instance_types = [var.instance_type]
+}
 
-  eks_managed_node_group_defaults = {
-    ami_type               = "AL2_x86_64"
-    instance_types         = ["t3.medium"]
-    vpc_security_group_ids = [var.security_group]
-  }
-
-  eks_managed_node_groups = {
-    node_group = {
-      min_size     = 2
-      max_size     = 6
-      desired_size = 2
-    }
-  }
+output "cluster_endpoint" {
+  value = aws_eks_cluster.this.endpoint
 }

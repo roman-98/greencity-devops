@@ -1,29 +1,41 @@
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "5.7.0"
+resource "aws_vpc" "this" {
+  cidr_block = var.cidr_block
+}
 
-  name                 = var.cluster_name
-  cidr                 = var.vpc_cidr
-  azs                  = var.azs
-  private_subnets      = ["10.0.1.0/24", "10.0.2.0/24"]
-  public_subnets       = ["10.0.3.0/24", "10.0.4.0/24"]  # Створюємо два блоки для AZ
+resource "aws_subnet" "private" {
+  count = length(var.azs)
+  
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = cidrsubnet(var.cidr_block, 8, count.index)
+  availability_zone = element(var.azs, count.index)
+  
+  map_public_ip_on_launch = false
+}
 
-  enable_nat_gateway   = true
-  single_nat_gateway   = true
-  enable_dns_hostnames = true
-  enable_dns_support   = true
+resource "aws_security_group" "private_sg" {
+  name        = "private-sg"
+  description = "Allow internal traffic"
+  vpc_id      = aws_vpc.this.id
 
-  tags = {
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = [var.cidr_block]
   }
 
-  public_subnet_tags = {
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-    "kubernetes.io/role/elb"                    = "1"
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
+}
 
-  private_subnet_tags = {
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-    "kubernetes.io/role/internal-elb"           = "1"
-  }
+output "vpc_id" {
+  value = aws_vpc.this.id
+}
+
+output "private_subnets" {
+  value = aws_subnet.private[*].id
 }
