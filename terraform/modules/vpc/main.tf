@@ -6,7 +6,7 @@ resource "aws_subnet" "private" {
   count = length(var.azs)
   
   vpc_id            = aws_vpc.this.id
-  cidr_block        = var.private_subnets
+  cidr_block        = [var.private_subnets]
   availability_zone = element(var.azs, count.index)
   
   map_public_ip_on_launch = false
