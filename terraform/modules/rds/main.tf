@@ -12,7 +12,7 @@ resource "aws_db_instance" "this" {
 
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name       = "rds-subnet-group"
-  subnet_ids = var.private_subnets
+  subnet_ids = module.vpc.private_subnets
 }
 
 resource "aws_security_group" "rds_sg" {

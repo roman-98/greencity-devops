@@ -2,10 +2,6 @@ variable "vpc_id" {
   type = string
 }
 
-variable "private_subnets" {
-  type = list(string)
-}
-
 variable "db_identifier" {
   type = string
 }

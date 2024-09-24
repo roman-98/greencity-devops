@@ -2,7 +2,7 @@
 module "vpc" {
   source = "./modules/vpc"
   
-  cidr_block = "10.0.0.0/16"
+  cidr_block = module.vpc.cidr_block
   azs        = ["us-west-2a", "us-west-2b"]
 }
 
@@ -63,7 +63,7 @@ module "eks" {
   source = "./modules/eks"
   
   vpc_id           = module.vpc.vpc_id
-  private_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnets  = module.vpc.private_subnets
   cluster_name     = "my-eks-cluster"
   instance_type    = "t3.medium"
   cluster_role_arn = aws_iam_role.eks_cluster_role.arn
@@ -75,7 +75,6 @@ module "rds" {
   source = "./modules/rds"
   
   vpc_id            = module.vpc.vpc_id
-  private_subnets   = ["10.0.1.0/24", "10.0.2.0/24"]
   db_identifier     = "my-db"
   db_instance_class = "db.t3.medium"
   db_name           = "mydatabase"
