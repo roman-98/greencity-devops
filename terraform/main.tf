@@ -60,14 +60,6 @@ resource "aws_security_group" "rds_sg" {
   }
 }
 
-module "db_subnet_group" {
-  source  = "terraform-aws-modules/rds/aws//modules/db_subnet_group"
-  version = "5.6.0"
-
-  name       = "my-db-subnet-group"
-  subnet_ids = module.vpc.private_subnets
-}
-
 module "rds" {
   source  = "terraform-aws-modules/rds/aws"
   version = "5.6.0"
