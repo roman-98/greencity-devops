@@ -43,6 +43,10 @@ provider "kubernetes" {
 }
 */
 
+provider "aws" {
+  region = "us-west-2"  # Вкажіть свій регіон
+}
+
 locals {
   cluster_name = "abhi-eks-${random_string.suffix.result}"
 }
