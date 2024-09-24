@@ -45,3 +45,51 @@ resource "aws_security_group_rule" "all_worker_mgmt_egress" {
   type              = "egress"
   cidr_blocks       = ["0.0.0.0/0"]
 }
+
+resource "random_password" "rds_password" {
+  length  = 16
+  special = true
+}
+
+resource "aws_security_group" "rds_sg" {
+  name_prefix = "rds_security_group"
+  vpc_id      = module.vpc.vpc_id
+
+  tags = {
+    Name = "rds_security_group"
+  }
+}
+
+module "rds" {
+  source  = "terraform-aws-modules/rds/aws"
+  version = "5.6.0"
+
+  identifier         = "my-postgres-db"
+  engine             = "postgres"
+  engine_version     = "13.4"
+  instance_class     = "db.t3.medium"
+  allocated_storage  = 20
+  storage_type       = "gp2"
+  username           = "admin"
+  password           = random_password.rds_password.result
+  multi_az           = true
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  db_subnet_group_name   = module.db_subnet_group.this_db_subnet_group_name
+
+  subnet_ids = module.vpc.private_subnets
+
+  tags = {
+    Name = "my-postgres-db"
+  }
+}
+
+output "rds_endpoint" {
+  description = "PostgreSQL RDS endpoint"
+  value       = module.rds.db_instance_endpoint
+}
+
+output "rds_password" {
+  description = "Пароль для PostgreSQL RDS"
+  value       = random_password.rds_password.result
+  sensitive   = true
+}
