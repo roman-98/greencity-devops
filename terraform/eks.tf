@@ -13,18 +13,17 @@ resource "aws_eks_cluster" "my_cluster" {
   depends_on = [aws_iam_role_policy_attachment.eks_AmazonEKSClusterPolicy]
 }
 
-resource "aws_iam_role" "eks_role" {
-  name = "eks_role"
+resource "aws_iam_role" "eks_node_role" {
+  name = "eks_node_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action    = "sts:AssumeRole"
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
       Principal = {
-        Service = "eks.amazonaws.com"
+        Service = "ec2.amazonaws.com"
       }
-      Effect    = "Allow"
-      Sid       = ""
     }]
   })
 }
@@ -44,16 +43,18 @@ resource "aws_eks_node_group" "my_eks_node_group" {
   node_group_name = "my-eks-node-group"
   node_role_arn   = aws_iam_role.eks_node_role.arn
   subnet_ids      = [aws_subnet.private_subnet_a.id, aws_subnet.private_subnet_b.id]
-  
+
   scaling_config {
-    desired_size = 2  # Кількість нод за замовчуванням
-    max_size     = 5  # Максимальна кількість нод для автоскейлінгу
-    min_size     = 1  # Мінімальна кількість нод для автоскейлінгу
+    desired_size = 2
+    max_size     = 5
+    min_size     = 1
   }
 
   update_config {
     max_unavailable = 1
   }
+
+  ami_type = "AL2_x86_64"  # Додано для правильного AMI
 
   tags = {
     Name = "my_eks_node_group"
