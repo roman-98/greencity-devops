@@ -46,3 +46,12 @@ resource "aws_security_group" "rds_sg" {
   }
 }
 
+resource "aws_db_parameter_group" "this" {
+  name   = var.db_parameter_group_name
+  family = var.db_parameter_group_family # Додайте правильну сім'ю для вашої бази даних
+  description = "Custom parameter group for PostgreSQL"
+
+  tags = {
+    Name = "custom-parameter-group"
+  }
+}
