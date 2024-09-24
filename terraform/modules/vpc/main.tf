@@ -20,6 +20,8 @@ resource "aws_subnet" "private" {
   tags = {
     Name = "Private Subnet ${count.index + 1}"
   }
+
+  depends_on = [aws_vpc.this]
 }
 
 resource "aws_security_group" "private_sg" {
@@ -40,6 +42,8 @@ resource "aws_security_group" "private_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  depends_on = [aws_vpc.this]
 }
 
 output "vpc_id" {
