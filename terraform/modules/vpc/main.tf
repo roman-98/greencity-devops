@@ -7,7 +7,7 @@ resource "aws_subnet" "private" {
   
   vpc_id            = aws_vpc.this.id
   cidr_block        = [var.private_subnets]
-  availability_zone = element(var.azs, count.index)
+  availability_zone = element(data.aws_availability_zones.available.names, count.index)
   
   map_public_ip_on_launch = false
 }
@@ -21,7 +21,7 @@ resource "aws_security_group" "private_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24", "10.0.2.0/24"]
+    cidr_blocks = var.private_subnets
   }
 
   egress {
