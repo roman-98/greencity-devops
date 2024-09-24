@@ -13,7 +13,7 @@ module "rds" {
   multi_az           = true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
-  family = var.family   
+  family = "postgres13"  
 
   # Підмережі для Multi-AZ
   subnet_ids = module.vpc.private_subnets
