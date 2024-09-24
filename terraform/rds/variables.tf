@@ -3,7 +3,8 @@ variable "db_parameter_group_name" {
   type        = string
 }
 
-variable "db_parameter_group_family" {
+variable "family" {
   description = "The DB parameter group family"
   type        = string
+  default     = "postgres13"
 }

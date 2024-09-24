@@ -13,6 +13,8 @@ module "rds" {
   multi_az           = true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
+  family = var.family   
+
   # Підмережі для Multi-AZ
   subnet_ids = module.vpc.private_subnets
 
@@ -48,7 +50,7 @@ resource "aws_security_group" "rds_sg" {
 
 resource "aws_db_parameter_group" "this" {
   name   = var.db_parameter_group_name
-  family = var.db_parameter_group_family # Додайте правильну сім'ю для вашої бази даних
+  family = var.family # Додайте правильну сім'ю для вашої бази даних
   description = "Custom parameter group for PostgreSQL"
 
   tags = {
