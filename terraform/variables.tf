@@ -12,3 +12,4 @@ variable "kubernetes_version" {
   default     = "1.27"
   description = "Версія Kubernetes для EKS"
 }
+
