@@ -60,6 +60,14 @@ resource "aws_security_group" "rds_sg" {
   }
 }
 
+module "db_subnet_group" {
+  source  = "terraform-aws-modules/rds/aws//modules/db_subnet_group"
+  version = "5.6.0"
+
+  name       = "my-db-subnet-group"
+  subnet_ids = module.vpc.private_subnets
+}
+
 module "rds" {
   source  = "terraform-aws-modules/rds/aws"
   version = "5.6.0"
@@ -74,7 +82,7 @@ module "rds" {
   password           = random_password.rds_password.result
   multi_az           = true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  db_subnet_group_name   = module.db_subnet_group
+  db_subnet_group_name   = module.db_subnet_group.name
 
   subnet_ids = module.vpc.private_subnets
 
