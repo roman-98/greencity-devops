@@ -14,8 +14,4 @@ output "region" {
   value = var.aws_region
 }
 
-output "rds_endpoint" {
-  description = "PostgreSQL RDS endpoint"
-  value       = module.rds_endpoint
-}
 
