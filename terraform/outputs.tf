@@ -14,5 +14,12 @@ output "region" {
   value = var.aws_region
 }
 
+output "id" {
+  description = "ID групи підмереж"
+  value       = aws_db_subnet_group.this.id
+}
 
-
+output "name" {
+  description = "Ім'я групи підмереж"
+  value       = aws_db_subnet_group.this.name
+}
