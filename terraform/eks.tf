@@ -1,6 +1,3 @@
-# eks.tf
-
-# Data source to get the current AWS account ID
 data "aws_caller_identity" "current" {}
 
 # IAM Role for EKS Cluster
@@ -49,7 +46,7 @@ resource "aws_iam_role" "vpc_cni_irsa_role" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = aws_eks_cluster.my_cluster.identity[0].oidc[0].issuer
+          Federated = "${aws_eks_cluster.my_cluster.identity[0].oidc[0].issuer}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
@@ -104,7 +101,7 @@ resource "aws_iam_role_policy" "eks_create_cluster_policy" {
       {
         Effect = "Allow"
         Action = "eks:CreateCluster"
-        Resource = "arn:aws:eks:us-west-2:${data.aws_caller_identity.current.account_id}:cluster/my-cluster"
+        Resource = "arn:aws:eks:us-east-1:${data.aws_caller_identity.current.account_id}:cluster/my-cluster"
       },
       {
         Effect = "Allow"
@@ -163,30 +160,4 @@ resource "aws_iam_role_policy_attachment" "eks_CNI_Policy" {
 resource "aws_iam_role_policy_attachment" "eks_RegistryPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.eks_node_role.name
-}
-
-# Kubernetes ConfigMap for aws-auth
-resource "kubectl_manifest" "aws_auth" {
-  yaml_body = <<EOT
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: aws-auth
-  namespace: kube-system
-data:
-  mapRoles: |
-    - rolearn: ${aws_iam_role.eks_node_role.arn}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-    - rolearn: ${aws_iam_role.eks_role.arn}
-      username: admin
-      groups:
-        - system:masters
-EOT
-
-  depends_on = [
-    aws_eks_cluster.my_cluster
-  ]
 }
