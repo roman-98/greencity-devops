@@ -9,8 +9,17 @@ module "vpc" {
   private_subnets = ["10.0.2.0/24", "10.0.4.0/24"]
 
   tags = {
-    Terraform = "true"
-    Environment = "dev"
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+  }
+
+  public_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = "1"
+  }
+
+  private_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = "1"
   }
 }
 
@@ -63,4 +72,9 @@ resource "aws_security_group" "rds_sg" {
   tags = {
     Name = "rds_security_group"
   }
+}
+
+
+output "vpc_id" {
+  value = aws_vpc.greencity.id
 }
