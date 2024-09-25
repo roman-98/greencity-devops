@@ -1,7 +1,3 @@
-module "vpc" {
-  source = "terraform/vpc.tf"
-}
-
 resource "aws_security_group" "all_worker_mgmt" {
   name_prefix = "all_worker_management"
   vpc_id      = module.vpc.greencity.vpc_id

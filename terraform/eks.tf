@@ -1,7 +1,3 @@
-module "vpc" {
-  source = "terraform/vpc.tf"
-}
-
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "20.8.4"

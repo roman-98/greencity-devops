@@ -19,10 +19,7 @@ resource "aws_db_instance" "my_db" {
 
 resource "aws_db_subnet_group" "my_db_subnet_group" {
   name       = "my_db_subnet_group"
-  subnet_ids = [
-    aws_subnet.private_subnet_a.id,
-    aws_subnet.private_subnet_b.id
-  ]
+  subnet_ids = module.vpc.private_subnets
 
   tags = {
     Name = "my_db_subnet_group"
