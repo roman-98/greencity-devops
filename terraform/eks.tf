@@ -82,7 +82,7 @@ module "vpc_cni_irsa" {
 
   oidc_providers = {
     main = {
-      provider_arn               = aws_eks_cluster.my_cluster.identity[0].oidc.issuer,
+      provider_arn               = aws_eks_cluster.my_cluster.identity[0].oidc[0].issuer,
       namespace_service_accounts = ["kube-system:aws-node"]
     }
   }
