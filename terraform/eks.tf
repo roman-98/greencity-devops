@@ -49,12 +49,12 @@ resource "aws_iam_role" "vpc_cni_irsa_role" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = aws_eks_cluster.my_cluster.identity[0].oidc.issuer
+          Federated = aws_eks_cluster.my_cluster.identity[0].oidc[0].issuer
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${aws_eks_cluster.my_cluster.identity[0].oidc.issuer}:sub" = "system:serviceaccount:kube-system:aws-node"
+            "${aws_eks_cluster.my_cluster.identity[0].oidc[0].issuer}:sub" = "system:serviceaccount:kube-system:aws-node"
           }
         }
       }
