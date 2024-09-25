@@ -17,8 +17,8 @@ terraform {
     }
 
    kubectl = {
-      source  = "hashicorp/kubectl"
-      version = "~> 2.0"  # Вкажіть останню версію
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
     }
 
   }
