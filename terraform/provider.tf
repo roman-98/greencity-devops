@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.15.0"
+      version = "~> 5.40.0"
     }
 
     random = {
@@ -14,6 +14,11 @@ terraform {
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = ">= 2.0.1"
+    }
+
+   kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
     }
 
   }
@@ -44,7 +49,11 @@ provider "kubernetes" {
 */
 
 provider "aws" {
-  region = "eu-west-3"
+  region = "us-east-1"  # Вкажіть свій регіон
+}
+
+locals {
+  cluster_name = "abhi-eks-${random_string.suffix.result}"
 }
 
 resource "random_string" "suffix" {
