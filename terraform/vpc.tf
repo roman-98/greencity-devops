@@ -76,3 +76,8 @@ resource "aws_security_group" "rds_sg" {
     Name = "rds_security_group"
   }
 }
+
+
+output "vpc_id" {
+  value = aws_vpc.greencity.id
+}
