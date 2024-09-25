@@ -1,4 +1,4 @@
-resource "aws_vpc" "main" {
+resource "aws_vpc" "GreenCity" {
   cidr_block = "10.0.0.0/16"
 
   tags = {
@@ -59,7 +59,7 @@ resource "aws_security_group" "rds_sg" {
   vpc_id = aws_vpc.main.id
 
   ingress {
-    from_port   = 5432  # для PostgreSQL, змініть на 3306 для MySQL
+    from_port   = 5432 
     to_port     = 5432
     protocol    = "tcp"
     cidr_blocks = ["10.0.2.0/24", "10.0.4.0/24"]
