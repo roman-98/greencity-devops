@@ -7,6 +7,7 @@ resource "aws_eks_cluster" "my_cluster" {
       aws_subnet.public_subnet_a.id,
       aws_subnet.public_subnet_b.id
     ]
+    endpoint_public_access  = true
     security_group_ids = [aws_security_group.eks_sg.id]
   }
 
