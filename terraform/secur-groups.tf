@@ -1,6 +1,6 @@
 resource "aws_security_group" "all_worker_mgmt" {
   name_prefix = "all_worker_management"
-  vpc_id      = vpc.GreenCity.vpc_id
+  vpc_id      = vpc.greencity.vpc_id
 }
 
 resource "aws_security_group_rule" "all_worker_mgmt_ingress" {
