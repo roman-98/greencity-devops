@@ -59,7 +59,6 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-# Public Route Table
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.main.id
 
@@ -73,7 +72,6 @@ resource "aws_route_table" "public_rt" {
   }
 }
 
-# Associate Public Subnets with the Public Route Table
 resource "aws_route_table_association" "public_subnet_a_assoc" {
   subnet_id      = aws_subnet.public_subnet_a.id
   route_table_id = aws_route_table.public_rt.id
@@ -84,7 +82,6 @@ resource "aws_route_table_association" "public_subnet_b_assoc" {
   route_table_id = aws_route_table.public_rt.id
 }
 
-# Private Route Table (no Internet access)
 resource "aws_route_table" "private_rt" {
   vpc_id = aws_vpc.main.id
 
@@ -93,7 +90,6 @@ resource "aws_route_table" "private_rt" {
   }
 }
 
-# Associate Private Subnets with the Private Route Table
 resource "aws_route_table_association" "private_subnet_a_assoc" {
   subnet_id      = aws_subnet.private_subnet_a.id
   route_table_id = aws_route_table.private_rt.id
@@ -104,7 +100,6 @@ resource "aws_route_table_association" "private_subnet_b_assoc" {
   route_table_id = aws_route_table.private_rt.id
 }
 
-# Security Group for EKS
 resource "aws_security_group" "eks_sg" {
   vpc_id = aws_vpc.main.id
 
@@ -134,7 +129,6 @@ resource "aws_security_group" "eks_sg" {
   }
 }
 
-# Security Group for RDS (PostgreSQL)
 resource "aws_security_group" "rds_sg" {
   vpc_id = aws_vpc.main.id
 

@@ -1,6 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-# IAM Role for EKS Cluster
 resource "aws_iam_role" "eks_role" {
   name = "eks_role"
 
@@ -18,7 +17,6 @@ resource "aws_iam_role" "eks_role" {
   })
 }
 
-# IAM Role for EKS Nodes
 resource "aws_iam_role" "eks_node_role" {
   name = "eks_node_role"
 
@@ -36,7 +34,6 @@ resource "aws_iam_role" "eks_node_role" {
   })
 }
 
-# IAM Role for VPC CNI with IRSA (IAM Roles for Service Accounts)
 resource "aws_iam_role" "vpc_cni_irsa_role" {
   name = "VPC-CNI-IRSA"
 
@@ -59,7 +56,6 @@ resource "aws_iam_role" "vpc_cni_irsa_role" {
   })
 }
 
-# EKS Cluster
 resource "aws_eks_cluster" "my_cluster" {
   name     = "my-cluster"
   role_arn = aws_iam_role.eks_role.arn
@@ -79,7 +75,6 @@ resource "aws_eks_cluster" "my_cluster" {
   ]
 }
 
-# IAM Policies for EKS Role
 resource "aws_iam_role_policy_attachment" "eks_AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.eks_role.name
@@ -90,7 +85,6 @@ resource "aws_iam_role_policy_attachment" "eks_AmazonEKSServicePolicy" {
   role       = aws_iam_role.eks_role.name
 }
 
-# IAM Policy Attachment for EKS Create Cluster Permission
 resource "aws_iam_role_policy" "eks_create_cluster_policy" {
   name = "eks-create-cluster-policy"
   role = aws_iam_role.eks_role.name
@@ -122,7 +116,6 @@ resource "aws_iam_role_policy" "eks_create_cluster_policy" {
   })
 }
 
-# EKS Managed Node Group
 resource "aws_eks_node_group" "my_node_group" {
   cluster_name    = aws_eks_cluster.my_cluster.name
   node_group_name = "my-node-group"
@@ -146,7 +139,6 @@ resource "aws_eks_node_group" "my_node_group" {
   ]
 }
 
-# IAM Policies for EKS Node Group
 resource "aws_iam_role_policy_attachment" "eks_NodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.eks_node_role.name

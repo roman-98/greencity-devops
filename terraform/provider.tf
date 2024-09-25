@@ -49,7 +49,7 @@ provider "kubernetes" {
 */
 
 provider "aws" {
-  region = "us-east-1"  # Вкажіть свій регіон
+  region = "us-east-1"
 }
 
 locals {
