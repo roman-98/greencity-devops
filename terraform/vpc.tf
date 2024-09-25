@@ -24,7 +24,7 @@ module "vpc" {
 }
 
 resource "aws_security_group" "eks_sg" {
-  vpc_id = module.vpc.greencity.id
+  vpc_id = module.vpc.vpc_id
 
   ingress {
     from_port   = 80
@@ -53,7 +53,7 @@ resource "aws_security_group" "eks_sg" {
 }
 
 resource "aws_security_group" "rds_sg" {
-  vpc_id = module.vpc.greencity.id
+  vpc_id = module.vpc.vpc_id
 
   ingress {
     from_port   = 5432 
@@ -72,9 +72,4 @@ resource "aws_security_group" "rds_sg" {
   tags = {
     Name = "rds_security_group"
   }
-}
-
-
-output "vpc_id" {
-  value = aws_vpc.greencity.id
 }
