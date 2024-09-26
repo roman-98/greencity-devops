@@ -5,8 +5,8 @@ module "vpc" {
 module "rds" {
   source = "./modules/rds"
   
-  username               = module.rds.username
-  password               = module.rds.password
+  username               = module.rds.var.username
+  password               = module.rds.var.password
 
   vpc_security_group_ids = module.vpc.rds_security_group_id
   subnet_group_name      = module.vpc.rds_subnet_group_name
