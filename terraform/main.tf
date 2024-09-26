@@ -14,6 +14,14 @@ module "rds" {
 
 }
 
+module "eks" {
+  source = "./modules/eks"
+
+  private_subnet_a_id   = module.vpc.private_subnet_a.id
+  eks_security_group_id = module.vpc.eks_security_group.id
+
+}
+
 variable "username" {
   description = "The master username for the DB instance."
   type        = string
