@@ -87,3 +87,30 @@ resource "aws_db_subnet_group" "my_db_subnet_group" {
     Name = "my_db_subnet_group"
   }
 }
+
+resource "aws_route_table" "private_rt" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = var.private_subnet_a_cidr 
+  }
+
+  route {
+    cidr_block = var.private_subnet_b_cidr 
+  }
+
+  tags = {
+    Name = "private_route_table"
+  }
+}
+
+resource "aws_route_table_association" "private_subnet_a_association" {
+  subnet_id      = aws_subnet.private_subnet_a.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
+resource "aws_route_table_association" "private_subnet_b_association" {
+  subnet_id      = aws_subnet.private_subnet_b.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
