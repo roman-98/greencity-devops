@@ -1,7 +1,3 @@
-module "vpc" {
-  source = "../vpc"
-}
-
 resource "aws_db_instance" "greencity" {
   identifier              = var.identifier
   engine                  = var.engine
