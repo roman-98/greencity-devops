@@ -4,16 +4,9 @@ module "vpc" {
 
 module "rds" {
   source = "./modules/rds"
-
-  identifier             = "my-database"
-  engine                 = "postgres"
-  engine_version         = "16"
-  instance_class         = "db.t3.micro"
-  allocated_storage      = 20
-  storage_type           = "gp2"
-  username               = "postgres"
-  password               = "yourpassword"
-  db_name                = "mydb"
+  
+  username               = module.rds.username
+  password               = module.rds.password
 
   vpc_security_group_ids = module.vpc.rds_security_group_id
   subnet_group_name      = module.vpc.rds_subnet_group_name

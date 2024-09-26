@@ -25,7 +25,7 @@ variable "instance_class" {
 variable "allocated_storage" {
   description = "The amount of storage (in GB) to allocate for the DB instance."
   type        = number
-  default     = 20
+  default     = 5
 }
 
 variable "storage_type" {
