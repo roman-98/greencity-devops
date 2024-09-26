@@ -25,6 +25,6 @@ output "rds_security_group_id" {
 
 output "rds_subnet_group_name" {
   description = "The subnet group name for RDS."
-  value       = aws_db_subnet_group.my_db_subnet_group.name
+  value       = aws_db_subnet_group.rds_subnet_group.name
 }
 
