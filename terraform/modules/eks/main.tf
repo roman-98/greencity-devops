@@ -3,7 +3,7 @@ resource "aws_eks_cluster" "main" {
   role_arn = aws_iam_role.eks_cluster.arn
 
   vpc_config {
-    subnet_ids              = [var.private_subnet_a_id]
+    subnet_ids              = [var.private_subnet_a_id, var.private_subnet_b_id]
     security_group_ids      = [var.eks_security_group_id]
     endpoint_private_access = true
     endpoint_public_access  = false
@@ -16,7 +16,7 @@ resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "${var.cluster_name}-node-group"
   node_role_arn   = aws_iam_role.eks_nodes.arn
-  subnet_ids      = [var.private_subnet_a_id]
+  subnet_ids      = [var.private_subnet_a_id, var.private_subnet_b_id]
 
   scaling_config {
     desired_size = var.desired_size

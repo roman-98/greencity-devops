@@ -1,7 +1,7 @@
 variable "identifier" {
   description = "The identifier for the RDS instance."
   type        = string
-  default     = "greencity-database"
+  default = "greencity-database"
 }
 
 variable "engine" {
@@ -48,7 +48,7 @@ variable "password" {
 variable "db_name" {
   description = "The name of the database to create."
   type        = string
-  default     = "greencity"
+  default = "greencity"
 }
 
 variable "vpc_security_group_ids" {
@@ -72,11 +72,17 @@ variable "skip_final_snapshot" {
   default     = true
 }
 
+variable "multi_az" {
+  description = "Whether to enable Multi-AZ support for the DB instance."
+  type        = bool
+  default     = true
+}
+
 variable "tags" {
   description = "A map of tags to apply to the DB instance."
   type        = map(string)
   default     = {
-    Name      = "my_database"
+    Name = "my_database"
   }
 }
 
@@ -84,6 +90,6 @@ variable "subnet_tags" {
   description = "A map of tags to apply to the DB subnet group."
   type        = map(string)
   default     = {
-    Name      = "my_db_subnet_group"
+    Name = "my_db_subnet_group"
   }
 }

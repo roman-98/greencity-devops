@@ -16,6 +16,16 @@ resource "aws_subnet" "private_subnet_a" {
   }
 }
 
+resource "aws_subnet" "private_subnet_b" {
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = var.private_subnet_b_cidr
+  availability_zone = var.availability_zone_b
+
+  tags = {
+    Name = "private_subnet_b"
+  }
+}
+
 resource "aws_security_group" "eks_sg" {
   vpc_id = aws_vpc.this.id
 
@@ -52,14 +62,14 @@ resource "aws_security_group" "rds_sg" {
     from_port   = 5432  
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = [var.private_subnet_a_cidr]
+    cidr_blocks = [var.private_subnet_a_cidr, var.private_subnet_b_cidr]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [var.cidr_block, var.private_subnet_a_cidr]
+    cidr_blocks = [var.cidr_block, var.private_subnet_a_cidr, var.private_subnet_b_cidr]
   }
 
   tags = {
@@ -69,10 +79,13 @@ resource "aws_security_group" "rds_sg" {
 
 resource "aws_db_subnet_group" "my_db_subnet_group" {
   subnet_ids = [
-    aws_subnet.private_subnet_a.id
+    aws_subnet.private_subnet_a.id,
+    aws_subnet.private_subnet_b.id
   ]
 
   tags = {
     Name = "my_db_subnet_group"
   }
 }
+
+
