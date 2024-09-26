@@ -89,7 +89,7 @@ resource "aws_db_subnet_group" "my_db_subnet_group" {
 }
 
 resource "aws_route_table" "private_rt" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.this.id
 
   route {
     cidr_block = var.private_subnet_a_cidr 
