@@ -76,3 +76,15 @@ resource "aws_security_group" "rds_sg" {
     Name = "rds_security_group"
   }
 }
+
+resource "aws_db_subnet_group" "db_subnet_group" {
+  name       = "db_subnet_group"
+  subnet_ids = [
+    aws_subnet.private_subnet_a.id,
+    aws_subnet.private_subnet_b.id
+  ]
+
+  tags = {
+    Name = "db_subnet_group"
+  }
+}
