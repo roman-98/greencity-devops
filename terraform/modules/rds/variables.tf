@@ -72,6 +72,12 @@ variable "skip_final_snapshot" {
   default     = true
 }
 
+variable "multi_az" {
+  description = "Whether to enable Multi-AZ support for the DB instance."
+  type        = bool
+  default     = true
+}
+
 variable "tags" {
   description = "A map of tags to apply to the DB instance."
   type        = map(string)
