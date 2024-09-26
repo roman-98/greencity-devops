@@ -8,8 +8,8 @@ resource "aws_db_instance" "greencity" {
   username                = var.username
   password                = var.password
   db_name                 = var.db_name
-  vpc_security_group_ids  = module.vpc.rds_security_group_id
-  db_subnet_group_name    = module.vpc.rds_subnet_group_name
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.my_db_subnet_group.name
   skip_final_snapshot     = var.skip_final_snapshot
 
   tags = var.tags
