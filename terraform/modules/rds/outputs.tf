@@ -8,7 +8,4 @@ output "rds_instance_id" {
   value       = aws_db_instance.greencity.id
 }
 
-output "rds_subnet_group_name" {
-  description = "The name of the DB subnet group."
-  value       = aws_db_subnet_group.greencity.name
-}
+

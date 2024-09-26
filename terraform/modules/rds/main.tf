@@ -19,10 +19,3 @@ resource "aws_db_instance" "greencity" {
 
   tags = var.tags
 }
-
-resource "aws_db_subnet_group" "greencity" {
-  name       = var.subnet_group_name
-  subnet_ids = [module.vpc.private_subnet_a_id, module.vpc.private_subnet_b_id]
-
-  tags = var.subnet_tags
-}
