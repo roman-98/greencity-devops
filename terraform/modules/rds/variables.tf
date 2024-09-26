@@ -34,6 +34,17 @@ variable "storage_type" {
   default     = "gp2"
 }
 
+variable "username" {
+  description = "The master username for the DB instance."
+  type        = string
+}
+
+variable "password" {
+  description = "The master password for the DB instance."
+  type        = string
+  sensitive   = true
+}
+
 variable "db_name" {
   description = "The name of the database to create."
   type        = string
