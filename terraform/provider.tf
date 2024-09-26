@@ -49,11 +49,7 @@ provider "kubernetes" {
 */
 
 provider "aws" {
-  region = "us-east-1"  # Вкажіть свій регіон
-}
-
-locals {
-  cluster_name = "abhi-eks-${random_string.suffix.result}"
+  region = "eu-west-3"
 }
 
 resource "random_string" "suffix" {
