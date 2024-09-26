@@ -45,11 +45,10 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: cd terraform/ && terraform plan
         env:
           DB_USERNAME: ${{ secrets.DATASOURCE_USER }}
           DB_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
-        run: terraform plan -var "username=${{ secrets.DATASOURCE_USER }}" -var "password=${{ secrets.DATASOURCE_PASSWORD }}"
+        run: cd terraform/ && terraform plan -var "username=${{ secrets.DATASOURCE_USER }}" -var "password=${{ secrets.DATASOURCE_PASSWORD }}"
         continue-on-error: true
 
       - name: Terraform Plan Status
