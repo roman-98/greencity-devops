@@ -1,7 +1,3 @@
-module "rds" {
-  source = "./modules/rds"
-}
-
 resource "aws_vpc" "this" {
   cidr_block = var.cidr_block
 
