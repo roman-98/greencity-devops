@@ -78,7 +78,7 @@ resource "aws_security_group" "rds_sg" {
 }
 
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name       = "db_subnet_group"
+  name       = "rds_subnet_group"
   subnet_ids = [
     aws_subnet.private_subnet_a.id,
     aws_subnet.private_subnet_b.id
