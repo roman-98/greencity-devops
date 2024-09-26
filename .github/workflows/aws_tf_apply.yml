@@ -43,5 +43,5 @@ jobs:
         run: cd terraform/ && terraform apply -auto-approve
         continue-on-error: true
 
-      #- name: Terraform Destroy
-        #run: cd terraform/ && terraform destroy -auto-approve
+      - name: Terraform Destroy
+        run: cd terraform/ && terraform destroy -auto-approve
