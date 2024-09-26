@@ -8,11 +8,6 @@ output "private_subnet_a_id" {
   value       = aws_subnet.private_subnet_a.id
 }
 
-output "private_subnet_b_id" {
-  description = "The ID of the private subnet B."
-  value       = aws_subnet.private_subnet_b.id
-}
-
 output "eks_security_group_id" {
   description = "The security group ID for EKS."
   value       = aws_security_group.eks_sg.id
