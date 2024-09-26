@@ -49,7 +49,6 @@ jobs:
         env:
           DB_USERNAME: ${{ secrets.DATASOURCE_USER }}
           DB_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
-        run: terraform apply -auto-approve -var "username=${{ secrets.DATASOURCE_USER }}" -var "password=${{ secrets.DATASOURCE_PASSWORD }}"
         continue-on-error: true
 
       - name: Terraform Plan Status
