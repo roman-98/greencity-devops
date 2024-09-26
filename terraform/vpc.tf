@@ -1,30 +1,33 @@
-module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
-  version = "5.13.0"
-
-  name = "greencity"
-  cidr = "10.0.0.0/16"
-
-  azs             = ["us-east-1a", "us-east-1b"]
-  private_subnets = ["10.0.2.0/24", "10.0.4.0/24"]
+resource "aws_vpc" "greencity" {
+  cidr_block = "10.0.0.0/16"
 
   tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    Name = "main_vpc"
   }
+}
 
-  public_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-    "kubernetes.io/role/elb"                      = "1"
+resource "aws_subnet" "private_subnet_a" {
+  vpc_id            = aws_vpc.greencity.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "us-east-1a"
+
+  tags = {
+    Name = "private_subnet_a"
   }
+}
 
-  private_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-    "kubernetes.io/role/internal-elb"             = "1"
+resource "aws_subnet" "private_subnet_b" {
+  vpc_id            = aws_vpc.greencity.id
+  cidr_block        = "10.0.4.0/24"
+  availability_zone = "us-east-1b"
+
+  tags = {
+    Name = "private_subnet_b"
   }
 }
 
 resource "aws_security_group" "eks_sg" {
-  vpc_id = module.vpc.vpc_id
+  vpc_id = aws_vpc.greencity.id
 
   ingress {
     from_port   = 80
@@ -53,10 +56,10 @@ resource "aws_security_group" "eks_sg" {
 }
 
 resource "aws_security_group" "rds_sg" {
-  vpc_id = module.vpc.vpc_id
+  vpc_id = aws_vpc.greencity.id
 
   ingress {
-    from_port   = 5432 
+    from_port   = 5432  
     to_port     = 5432
     protocol    = "tcp"
     cidr_blocks = ["10.0.2.0/24", "10.0.4.0/24"]

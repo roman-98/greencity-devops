@@ -1,30 +1,40 @@
-module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
-  version         = "20.24.2"
-  cluster_name    = local.cluster_name
-  cluster_version = 1.27
-  subnet_ids      = module.vpc.private_subnets
+resource "aws_eks_cluster" "my_cluster" {
+  name     = "greencity"
+  role_arn = aws_iam_role.eks_role.arn
 
-  enable_irsa = true
-
-  tags = {
-    cluster = "greencity"
+  vpc_config {
+    subnet_ids = [
+      aws_subnet.private_subnet_a.id,
+      aws_subnet.private_subnet_b.id
+    ]
+    security_group_ids = [aws_security_group.eks_sg.id]
   }
 
-  vpc_id = module.vpc.vpc_id
+  depends_on = [aws_iam_role_policy_attachment.eks_AmazonEKSClusterPolicy]
+}
 
-  eks_managed_node_group_defaults = {
-    ami_type               = "AL2_x86_64"
-    instance_types         = ["t3.medium"]
-    vpc_security_group_ids = [aws_security_group.all_worker_mgmt.id]
-  }
+resource "aws_iam_role" "eks_role" {
+  name = "eks_role"
 
-  eks_managed_node_groups = {
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Principal = {
+        Service = "eks.amazonaws.com"
+      }
+      Effect    = "Allow"
+      Sid       = ""
+    }]
+  })
+}
 
-    node_group = {
-      min_size     = 1
-      max_size     = 3
-      desired_size = 1
-    }
-  }
+resource "aws_iam_role_policy_attachment" "eks_AmazonEKSClusterPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role       = aws_iam_role.eks_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_AmazonEKSServicePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+  role       = aws_iam_role.eks_role.name
 }
