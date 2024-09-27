@@ -24,9 +24,7 @@ resource "aws_eks_node_group" "main" {
     min_size     = var.min_size
   }
 
-  depends_on = [
-    kubernetes_config_map.aws_auth,
-    aws_iam_role_policy_attachment.eks_nodes_policy]
+  depends_on = [aws_iam_role_policy_attachment.eks_nodes_policy]
 }
 
 resource "aws_iam_role" "eks_cluster" {
