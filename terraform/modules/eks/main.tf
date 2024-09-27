@@ -39,6 +39,11 @@ resource "aws_iam_role" "eks_cluster" {
         Principal = {
           Service = "eks.amazonaws.com"
         }
+      },
+      {
+        Action = "secretsmanager:GetSecretValue"
+        Effect = "Allow"
+        Resource = "arn:aws:secretsmanager:region:account-id:secret:secret-id"
       }
     ]
   })
