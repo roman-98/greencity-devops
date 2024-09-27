@@ -24,7 +24,9 @@ resource "aws_eks_node_group" "main" {
     min_size     = var.min_size
   }
 
-  depends_on = [aws_iam_role_policy_attachment.eks_nodes_policy]
+  depends_on = [
+    kubernetes_config_map.aws_auth,
+    aws_iam_role_policy_attachment.eks_nodes_policy]
 }
 
 resource "aws_iam_role" "eks_cluster" {
@@ -99,7 +101,7 @@ resource "kubernetes_config_map" "aws_auth" {
 
   data = {
     mapRoles = <<YAML
-- rolearn: arn:aws:iam::730335226605:role/eksctl-manu-eks-new2-nodegroup-ng-NodeInstanceRole-1NYUHVMYFP2TK
+- rolearn: arn:aws:iam::730335226605:role/my-eks-cluster-eks-nodes-role
   username: system:node:{{EC2PrivateDNSName}}
   groups:
   - system:bootstrappers
