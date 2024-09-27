@@ -39,6 +39,11 @@ resource "aws_iam_role" "eks_cluster" {
         Principal = {
           Service = "eks.amazonaws.com"
         }
+      },
+      {
+        Action = "secretsmanager:GetSecretValue"
+        Effect = "Allow"
+        Resource = "arn:aws:secretsmanager:region:account-id:secret:secret-id"
       }
     ]
   })
@@ -79,4 +84,37 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
 resource "aws_iam_role_policy_attachment" "ecr_read_only" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.eks_nodes.name
+}
+
+provider "kubernetes" {
+  host                   = aws_eks_cluster.main.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.main.token
+}
+
+data "aws_eks_cluster_auth" "main" {
+  name = aws_eks_cluster.main.name
+}
+
+resource "kubernetes_config_map" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+
+  data = {
+    mapRoles = <<YAML
+- rolearn: arn:aws:iam::730335226605:role/my-eks-cluster-eks-nodes-role
+  username: system:node:{{EC2PrivateDNSName}}
+  groups:
+  - system:bootstrappers
+  - system:nodes
+YAML
+    mapUsers = <<YAML
+- userarn: arn:aws:iam::730335226605:root
+  username: admin
+  groups:
+  - system:masters
+YAML
+  }
 }
