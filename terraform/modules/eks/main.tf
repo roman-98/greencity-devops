@@ -6,7 +6,12 @@ resource "aws_eks_cluster" "main" {
     subnet_ids              = [var.private_subnet_a_id, var.private_subnet_b_id]
     security_group_ids      = [var.eks_security_group_id]
     endpoint_private_access = true
-    endpoint_public_access  = false
+    endpoint_public_access  = true
+  }
+
+  access_config {
+    authentication_mode                         = "API"
+    bootstrap_cluster_creator_admin_permissions = true
   }
 
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
