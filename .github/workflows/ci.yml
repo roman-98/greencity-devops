@@ -120,7 +120,7 @@ jobs:
         git config --global user.name "Roman Strypa"
         git add helm/greencity-chart/values.yaml
         git commit -m "Update tag in Helm chart"
-        git push
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/roman-98/greencity-devops.git
 
   notify:
     name: Notify on completion
