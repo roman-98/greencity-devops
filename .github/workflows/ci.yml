@@ -120,7 +120,7 @@ jobs:
           git commit -m "Update tag in Helm chart to ${{github.run_id}}"
           git push
 
-  create-github-release:
+  release-helm-chart:
     runs-on: ubuntu-latest
     needs: update-newtag-in-helm-chart
     steps:
@@ -129,40 +129,61 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT_GITHUB }}
-      - name: Create Release
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+
+      - name: Update Helm chart version
+        run: |
+          CHART_YAML=helm/greencity-chart/Chart.yaml
+          CURRENT_VERSION=$(grep 'version:' $CHART_YAML | awk '{print $2}')
+          NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" $CHART_YAML
+          echo "CHART_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Update app version
+        run: |
+          CHART_YAML=helm/greencity-chart/Chart.yaml
+          NEW_APP_VERSION=1.0.0-${{github.run_id}}
+          sed -i "s/appVersion: .*/appVersion: \"$NEW_APP_VERSION\"/" $CHART_YAML
+          echo "APP_VERSION=$NEW_APP_VERSION" >> $GITHUB_ENV
+
+      - name: Update values.yaml
+        run: |
+          sed -i 's/tag: .*/tag: "${{ env.APP_VERSION }}"/' helm/greencity-chart/values.yaml
+
+      - name: Commit changes
+        run: |
+          git add helm/greencity-chart/Chart.yaml helm/greencity-chart/values.yaml
+          git commit -m "Update Helm chart to version ${{ env.CHART_VERSION }} with app version ${{ env.APP_VERSION }}"
+          git push
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.5.0
+        env:
+          CR_TOKEN: "${{ secrets.PAT_GITHUB }}"
+
+      - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
         with:
-          tag_name: v${{github.run_id}}
-          release_name: Release v${{github.run_id}}
+          tag_name: chart-v${{ env.CHART_VERSION }}
+          release_name: Helm Chart Release ${{ env.CHART_VERSION }}
           body: |
-            Release of version ${{github.run_id}}
+            Helm Chart Release ${{ env.CHART_VERSION }}
+            
+            App Version: ${{ env.APP_VERSION }}
             
             Changes in this Release:
             - Updated Helm chart with new image tag
           draft: false
           prerelease: false
-
-  release:
-    runs-on: ubuntu-latest
-    needs: create-github-release
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.PAT_GITHUB }}
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-      - name: Install Helm
-        uses: azure/setup-helm@v3
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.5.0
-        env:
-          CR_TOKEN: "${{ secrets.PAT_GITHUB }}"
 
   notify:
     name: Notify on completion
