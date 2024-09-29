@@ -18,7 +18,7 @@ spec:
       serviceAccountName: my-app-service-account
       containers:
         - name: greencity-backuser
-          image: ghcr.io/roman-98/greencity-backuser:1.0.0-latest
+          image: ghcr.io/roman-98/greencity-backuser:1.0.0-408d6ae
           env:
             - name: DATASOURCE_URL
               value: jdbc:postgresql://postgres-service:5432/greencity

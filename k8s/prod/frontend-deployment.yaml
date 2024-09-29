@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: greencity-frontend
-          image: ghcr.io/roman-98/greencity-frontend:1.0.0-latest
+          image: ghcr.io/roman-98/greencity-frontend:1.0.0-408d6ae
           ports:
             - containerPort: 80
