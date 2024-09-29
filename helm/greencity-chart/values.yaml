@@ -8,7 +8,7 @@ image:
   repository: roman-98/greencity-devops
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "11094513497"
+  tag: "1.0.0-11094691077"
 
 ingress:
   enabled: false
