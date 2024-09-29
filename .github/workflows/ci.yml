@@ -150,63 +150,32 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT_GITHUB }}
 
+      - name: Create Helm Archive
+        run: |
+          tar -czf helm-chart.tar.gz helm/greencity-chart 
+          echo "HELM_ARCHIVE_PATH=helm-chart.tar.gz" >> $GITHUB_ENV
+
       - name: Create Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
         with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
+          tag_name: v${{github.run_id}}
+          release_name: Release v${{github.run_id}}
           body: |
-            Release of version ${{ env.VERSION }}
-            Release of version ${{ github.run_id }}
+            Release of version ${{github.run_id}}
+            Release of version ${{github.run_id}}
           
             Changes in this Release:
             - Updated Helm chart with new image tag
           draft: false
           prerelease: false
-
-  release-helm-chart:
-    runs-on: ubuntu-latest
-    needs: create-github-release
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.PAT_GITHUB }}
-
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
-      - name: Install Helm
-        uses: azure/setup-helm@v3
-
-      - name: Package Helm chart
-        run: |
-          helm package helm/greencity-chart --destination ./charts
-          echo "CHART_PATH=charts/greencity-chart-$(grep 'version:' helm/greencity-chart/Chart.yaml | awk '{print $2}').tgz" >> $GITHUB_ENV
-
-      - name: Push Helm chart to OCI repository
-        run: |
-          helm registry login oci://greencity-devops
-          helm push ${{ env.CHART_PATH }} oci://greencity-devops/helm-charts 
-
-      - name: Push Helm chart to repository (alternative non-OCI repo)
-        run: |
-          helm repo index ./charts
-          helm push ${{ env.CHART_PATH }} oci://greencity-devops/helm-charts
-
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.5.0
-        env:
-          CR_TOKEN: "${{ secrets.PAT_GITHUB }}"
+          assets: |
+            ${{ env.HELM_ARCHIVE_PATH }}
 
   notify:
     name: Notify on completion
-    needs: release-helm-chart
+    needs: create-github-release
     runs-on: ubuntu-latest
     steps:
       - uses: 8398a7/action-slack@v3
