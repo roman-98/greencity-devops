@@ -111,14 +111,13 @@ jobs:
           token: ${{ secrets.PAT_GITHUB }}
       - name: Update tag in Helm chart
         run: |
-          echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
-          sed -i 's/tag: .*/tag: "${{ env.VERSION }}"/' helm/greencity-chart/values.yaml
+          sed -i 's/tag: .*/tag: "${{github.run_id}}"/' helm/greencity-chart/values.yaml
       - name: Commit and push changes
         run: |
           git config --global user.email "romanstripa@gmail.com"
           git config --global user.name "Roman Strypa"
           git add helm/greencity-chart/values.yaml
-          git commit -m "Update tag in Helm chart to ${{ env.VERSION }}"
+          git commit -m "Update tag in Helm chart to ${{github.run_id}}"
           git push
 
   create-github-release:
@@ -135,10 +134,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
         with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
+          tag_name: v${{github.run_id}}
+          release_name: Release v${{github.run_id}}
           body: |
-            Release of version ${{ env.VERSION }}
+            Release of version ${{github.run_id}}
             
             Changes in this Release:
             - Updated Helm chart with new image tag
