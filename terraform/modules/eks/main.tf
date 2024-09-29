@@ -6,7 +6,12 @@ resource "aws_eks_cluster" "main" {
     subnet_ids              = [var.private_subnet_a_id, var.private_subnet_b_id]
     security_group_ids      = [var.eks_security_group_id]
     endpoint_private_access = true
-    endpoint_public_access  = false
+    endpoint_public_access  = true
+  }
+
+  access_config {
+    authentication_mode                         = "API"
+    bootstrap_cluster_creator_admin_permissions = true
   }
 
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
@@ -39,11 +44,6 @@ resource "aws_iam_role" "eks_cluster" {
         Principal = {
           Service = "eks.amazonaws.com"
         }
-      },
-      {
-        Action = "secretsmanager:GetSecretValue"
-        Effect = "Allow"
-        Resource = "arn:aws:secretsmanager:region:account-id:secret:secret-id"
       }
     ]
   })
@@ -71,6 +71,11 @@ resource "aws_iam_role" "eks_nodes" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "eks_admin_nodes_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  role       = aws_iam_role.eks_nodes.name
+}
+
 resource "aws_iam_role_policy_attachment" "eks_nodes_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.eks_nodes.name
@@ -79,42 +84,4 @@ resource "aws_iam_role_policy_attachment" "eks_nodes_policy" {
 resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
   role       = aws_iam_role.eks_nodes.name
-}
-
-resource "aws_iam_role_policy_attachment" "ecr_read_only" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.eks_nodes.name
-}
-
-provider "kubernetes" {
-  host                   = aws_eks_cluster.main.endpoint
-  cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.main.token
-}
-
-data "aws_eks_cluster_auth" "main" {
-  name = aws_eks_cluster.main.name
-}
-
-resource "kubernetes_config_map" "aws_auth" {
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-  }
-
-  data = {
-    mapRoles = <<YAML
-- rolearn: arn:aws:iam::730335226605:role/my-eks-cluster-eks-nodes-role
-  username: system:node:{{EC2PrivateDNSName}}
-  groups:
-  - system:bootstrappers
-  - system:nodes
-YAML
-    mapUsers = <<YAML
-- userarn: arn:aws:iam::730335226605:root
-  username: admin
-  groups:
-  - system:masters
-YAML
-  }
 }
