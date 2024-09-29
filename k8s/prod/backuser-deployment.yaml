@@ -21,7 +21,7 @@ spec:
           image: ghcr.io/roman-98/greencity-backuser:1.0.0-408d6ae
           env:
             - name: DATASOURCE_URL
-              value: jdbc:postgresql://postgres-service:5432/greencity
+              value: greencity-database.cdy6c040ysbs.eu-west-3.rds.amazonaws.com
     
             - name: DATASOURCE_USER
               valueFrom:
