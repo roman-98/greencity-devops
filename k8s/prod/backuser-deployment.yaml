@@ -21,26 +21,26 @@ spec:
           image: ghcr.io/roman-98/greencity-backuser:1.0.0-408d6ae
           env:
             - name: DATASOURCE_URL
-              value: greencity-database.cdy6c040ysbs.eu-west-3.rds.amazonaws.com
-    
+              value: "jdbc:postgresql://greencity.cdy6c040ysbs.eu-west-3.rds.amazonaws.com:5432/greencity"
+              
             - name: DATASOURCE_USER
               valueFrom:
                 secretKeyRef:
                   name: aws-secrets-manager
                   key: DATASOURCE_USER
-  
+
             - name: DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: aws-secrets-manager
-                  key: DATASOURCE_PASSWORD
-  
+                  key: DB_PASSWORD
+
             - name: EMAIL_ADDRESS
               valueFrom:
                 secretKeyRef:
                   name: aws-secrets-manager
                   key: EMAIL_ADDRESS
-  
+
             - name: EMAIL_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -73,25 +73,25 @@ spec:
                 secretKeyRef:
                   name: aws-secrets-manager
                   key: CLOUD_NAME
-  
+
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
                   name: aws-secrets-manager
                   key: API_KEY
-  
+
             - name: API_SECRET
               valueFrom:
                 secretKeyRef:
                   name: aws-secrets-manager
                   key: API_SECRET
-  
+
             - name: MAX_FILE_SIZE
               valueFrom:
                 secretKeyRef:
                   name: aws-secrets-manager
                   key: MAX_FILE_SIZE
-  
+
             - name: MAX_REQUEST_SIZE
               valueFrom:
                 secretKeyRef:

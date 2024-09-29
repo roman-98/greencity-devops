@@ -18,7 +18,7 @@ spec:
       serviceAccountName: my-app-service-account
       containers:
         - name: greencity-backcore
-          image: ghcr.io/roman-98/greencity-backcore:1.0.0-408d6ae
+          image: ghcr.io/roman-98/greencity-backcore:{{ .Values.image.tag  }}
           env:
             - name: DATASOURCE_URL
               value: "jdbc:postgresql://greencity.cdy6c040ysbs.eu-west-3.rds.amazonaws.com:5432/greencity"

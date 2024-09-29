@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backcore-service
+  namespace: dev
+spec:
+  selector:
+    app: backcore
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backuser-service
+  namespace: dev
+spec:
+  selector:
+    app: backuser
+  ports:
+    - protocol: TCP
+      port: 8060
+      targetPort: 8060
+  type: ClusterIP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: dev
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer

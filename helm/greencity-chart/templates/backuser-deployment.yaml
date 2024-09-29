@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backcore-deployment
+  name: backuser-deployment
   namespace: dev
   labels:
-    app: backcore
+    app: backuser
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: backcore
+      app: backuser
   template:
     metadata:
       labels:
-        app: backcore
+        app: backuser
     spec:
       serviceAccountName: my-app-service-account
       containers:
-        - name: greencity-backcore
-          image: ghcr.io/roman-98/greencity-backcore:1.0.0-408d6ae
+        - name: greencity-backuser
+          image: ghcr.io/roman-98/greencity-backuser:{{ .Values.image.tag  }}
           env:
             - name: DATASOURCE_URL
               value: "jdbc:postgresql://greencity.cdy6c040ysbs.eu-west-3.rds.amazonaws.com:5432/greencity"
@@ -147,4 +147,4 @@ spec:
                   key: PROFILE
 
           ports:
-            - containerPort: 8080
+            - containerPort: 8060
