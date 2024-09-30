@@ -150,20 +150,17 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT_GITHUB }}
 
-      - name: Create Helm Archive
-        run: |
-          tar -czf helm-chart.tar.gz helm/greencity-chart 
-          echo "HELM_ARCHIVE_PATH=helm-chart.tar.gz" >> $GITHUB_ENV
-
       - name: Create Release
         uses: actions/create-release@v1
+        run: |
+          helm package helm/greencity-chart
+          echo "HELM_ARCHIVE_PATH=$(ls *.tgz)" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
         with:
           tag_name: v${{github.run_id}}
           release_name: Release v${{github.run_id}}
           body: |
-            Release of version ${{github.run_id}}
             Release of version ${{github.run_id}}
           
             Changes in this Release:
