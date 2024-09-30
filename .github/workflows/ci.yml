@@ -165,7 +165,7 @@ jobs:
           body: |
             Release of version ${{ github.run_id }}
       
-            Changes in this Release:
+          Changes in this Release:
           - Updated Helm chart with new image tag
         draft: false
         prerelease: false
