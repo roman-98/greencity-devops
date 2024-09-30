@@ -165,12 +165,11 @@ jobs:
           body: |
             Release of version ${{ github.run_id }}
       
-          Changes in this Release:
-          - Updated Helm chart with new image tag
-        draft: false
-        prerelease: false
-        assets: |
-          ${{ env.HELM_ARCHIVE_PATH }}
+            Changes in this Release:
+            - Updated Helm chart with new image tag
+          draft: false
+          prerelease: false
+          assets: ${{ env.HELM_ARCHIVE_PATH }}
 
   notify:
     name: Notify on completion
