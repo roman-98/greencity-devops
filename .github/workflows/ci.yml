@@ -151,10 +151,10 @@ jobs:
           token: ${{ secrets.PAT_GITHUB }}
 
       - name: Create Release
-        uses: actions/create-release@v1
         run: |
           helm package helm/greencity-chart
           echo "HELM_ARCHIVE_PATH=$(ls *.tgz)" >> $GITHUB_ENV
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
         with:
