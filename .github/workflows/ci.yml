@@ -167,10 +167,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
         with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release v${{ github.run_number }}
+          tag_name: v${{ github.run_id }}
+          release_name: Release v${{ github.run_id }}
           body: |
-            Release of Helm chart version ${{ github.run_number }}
+            Release of Helm chart version ${{ github.run_id }}
             
             Changes in this Release:
             - Updated Helm chart
