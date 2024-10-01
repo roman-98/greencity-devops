@@ -152,7 +152,9 @@ jobs:
 
       - name: Get Previous Commit Hash
         run: |
-          echo "PREV_COMMIT=$(git rev-parse HEAD^)" >> $GITHUB_ENV
+          PREV_COMMIT=$(git rev-parse HEAD^)
+          SHORT_PREV_COMMIT=${PREV_COMMIT:0:7}
+          echo "SHORT_PREV_COMMIT=$SHORT_PREV_COMMIT" >> $GITHUB_ENV
 
       - name: Set up Helm
         uses: azure/setup-helm@v1
@@ -171,7 +173,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
         with:
-          tag_name: ${{ env.PREV_COMMIT }} 
+          tag_name: ${{ env.SHORT_PREV_COMMIT }} 
           release_name: Release ${{ env.CHART_VERSION }}
           body: |
             Release of Helm chart version ${{ env.CHART_VERSION }}
