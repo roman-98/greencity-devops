@@ -182,7 +182,7 @@ jobs:
 
   notify:
     name: Notify on completion
-    needs: create-github-release
+    needs: update-chart-and-release
     runs-on: ubuntu-latest
     steps:
       - uses: 8398a7/action-slack@v3
