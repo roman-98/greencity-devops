@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend-deployment
-  namespace: dev
+  namespace: prod
   labels:
     app: frontend
 spec:
@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: greencity-frontend
-          image: ghcr.io/roman-98/greencity-frontend:1.0.0-latest
+          image: ghcr.io/roman-98/greencity-frontend:1.0.0-bb6e0a3
           ports:
             - containerPort: 80
