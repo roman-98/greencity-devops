@@ -89,14 +89,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
       - name: Set version
-        run: echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
+        run: | 
+          PREV_COMMIT=$(git rev-parse HEAD^)
+          SHORT_PREV_COMMIT=${PREV_COMMIT:0:7}
+          echo "SHORT_PREV_COMMIT=$SHORT_PREV_COMMIT" >> $GITHUB_ENV
       - name: Build and push ${{ matrix.component }} image
         uses: docker/build-push-action@v4
         with:
           context: ./greencity-${{ matrix.component }}-roman-98
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/greencity-${{ matrix.component }}:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/greencity-${{ matrix.component }}:${{ env.SHORT_PREV_COMMIT }}
             ghcr.io/${{ github.repository_owner }}/greencity-${{ matrix.component }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
