@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend-deployment
-  namespace: dev
+  namespace: prod
   labels:
     app: frontend
 spec:

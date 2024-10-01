@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backcore-service
-  namespace: dev
+  namespace: prod
 spec:
   selector:
     app: backcore
