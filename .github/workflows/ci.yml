@@ -126,7 +126,7 @@ jobs:
       - name: Update app version
         run: |
           CHART_YAML=helm/greencity-chart/Chart.yaml
-          NEW_APP_VERSION=1.0.0-${{ github.run_id }}
+          NEW_APP_VERSION=${{ github.run_id }}
           sed -i "s/appVersion: .*/appVersion: \"$NEW_APP_VERSION\"/" $CHART_YAML
           echo "APP_VERSION=$NEW_APP_VERSION" >> $GITHUB_ENV
 
@@ -160,6 +160,7 @@ jobs:
           cd helm/greencity-chart/ 
           helm package .
           echo "HELM_CHART_PATH=$(ls *.tgz)" >> $GITHUB_ENV
+          echo "PREV_COMMIT=$(git rev-parse HEAD^)" >> $GITHUB_ENV
 
       - name: Create Release
         id: create_release
@@ -167,7 +168,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
         with:
-          tag_name: v${{ github.run_id }}
+          tag_name: v${{ env.PREV_COMMIT }}
           release_name: Release v${{ github.run_id }}
           body: |
             Release of Helm chart version ${{ github.run_id }}
