@@ -133,8 +133,8 @@ jobs:
 
       - name: Update values.yaml with short commit hash
         run: |
-          SHORT_HASH=$(git rev-parse --short HEAD^)
-          sed -i "s/tag: .*/tag: \"$SHORT_HASH\"/" helm/greencity-chart/values.yaml
+          echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
+          sed -i "s/tag: .*/tag: \"$VERSION\"/" helm/greencity-chart/values.yaml
 
       - name: Commit and push changes
         run: |
