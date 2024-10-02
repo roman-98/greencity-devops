@@ -108,7 +108,6 @@ resource "helm_release" "secrets_csi_driver_aws_provider" {
   namespace  = "kube-system"
   version    = "0.3.9"
 
-  depends_on = [helm_release.secrets_csi_driver]
 }
 
 resource "aws_iam_openid_connect_provider" "eks" {
