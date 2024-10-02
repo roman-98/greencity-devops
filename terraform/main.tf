@@ -12,16 +12,19 @@ module "rds" {
   subnet_group_name      = module.vpc.rds_subnet_group_name
   subnet_ids             = [module.vpc.private_subnet_a_id]
 
+  depends_on = [module.vpc]
+
 }
 
-#module "eks" {
- # source = "./modules/eks"
+module "eks" {
+  source = "./modules/eks"
 
-  #private_subnet_a_id   = module.vpc.private_subnet_a_id
-  #private_subnet_b_id   = module.vpc.private_subnet_b_id
-  #eks_security_group_id = module.vpc.eks_security_group_id
+  private_subnet_a_id   = module.vpc.private_subnet_a_id
+  private_subnet_b_id   = module.vpc.private_subnet_b_id
+  eks_security_group_id = module.vpc.eks_security_group_id
 
-#}
+  depends_on = [module.rds]
+}
 
 variable "username" {
   description = "The master username for the DB instance."

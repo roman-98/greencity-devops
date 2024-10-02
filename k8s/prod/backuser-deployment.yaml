@@ -15,55 +15,55 @@ spec:
       labels:
         app: backuser
     spec:
-      serviceAccountName: my-app-service-account
+      serviceAccountName: myapp
       containers:
         - name: greencity-backuser
-          image: ghcr.io/roman-98/greencity-backuser:1.0.0-408d6ae
+          image: ghcr.io/roman-98/greencity-backuser:1.0.0-bb6e0a3
           env:
             - name: DATASOURCE_URL
-              value: "jdbc:postgresql://greencity.cdy6c040ysbs.eu-west-3.rds.amazonaws.com:5432/greencity"
-              
+              value: jdbc:postgresql://postgres-service:5432/greencity
+    
             - name: DATASOURCE_USER
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: DATASOURCE_USER
-
+                  name: myapp-k8s-secret
+                  key: k8s-datasource-user
+  
             - name: DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: DB_PASSWORD
-
+                  name: myapp-k8s-secret
+                  key: k8s-datasource-password
+  
             - name: EMAIL_ADDRESS
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: EMAIL_ADDRESS
-
+                  name: myapp-k8s-secret
+                  key: k8s-email-address
+  
             - name: EMAIL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: EMAIL_PASSWORD
+                  name: myapp-k8s-secret
+                  key: k8s-email-password
 
             - name: GOOGLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: GOOGLE_CLIENT_ID
+                  name: myapp-k8s-secret
+                  key: k8s-google-client-id
 
             - name: GOOGLE_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: GOOGLE_API_KEY
+                  name: myapp-k8s-secret
+                  key: k8s-google-api-key
 
             - name: GOOGLE_CLIENT_ID_MANAGER
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: GOOGLE_CLIENT_ID_MANAGER
+                  name: myapp-k8s-secret
+                  key: k8s-google-client-id-manager
 
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /app/google-creds.json
@@ -71,80 +71,88 @@ spec:
             - name: CLOUD_NAME
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: CLOUD_NAME
-
+                  name: myapp-k8s-secret
+                  key: k8s-cloud-name
+  
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: API_KEY
-
+                  name: myapp-k8s-secret
+                  key: k8s-api-key
+  
             - name: API_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: API_SECRET
-
+                  name: myapp-k8s-secret
+                  key: k8s-api-secret
+  
             - name: MAX_FILE_SIZE
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: MAX_FILE_SIZE
-
+                  name: myapp-k8s-secret
+                  key: k8s-max-file-size
+  
             - name: MAX_REQUEST_SIZE
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: MAX_REQUEST_SIZE
+                  name: myapp-k8s-secret
+                  key: k8s-max-request-size
 
             - name: BUCKET_NAME
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: BUCKET_NAME
+                  name: myapp-k8s-secret
+                  key: k8s-bucket-name
 
             - name: STATIC_URL
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: STATIC_URL
+                  name: myapp-k8s-secret
+                  key: k8s-static-url
 
             - name: DEFAULT_PROFILE_PICTURE
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: DEFAULT_PROFILE_PICTURE
+                  name: myapp-k8s-secret
+                  key: k8s-default-profile-picture
 
             - name: AZURE_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: AZURE_CONNECTION_STRING
+                  name: myapp-k8s-secret
+                  key: k8s-azure-connection-string
 
             - name: AZURE_CONTAINER_NAME
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: AZURE_CONTAINER_NAME
+                  name: myapp-k8s-secret
+                  key: k8s-azure-container-name
 
             - name: EndpointSuffix
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: EndpointSuffix
+                  name: myapp-k8s-secret
+                  key: k8s-endpoint-suffix
 
             - name: CHAT_LINK
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: CHAT_LINK
+                  name: myapp-k8s-secret
+                  key: k8s-chat-link
 
             - name: PROFILE
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: PROFILE
+                  name: myapp-k8s-secret
+                  key: k8s-profile
 
           ports:
             - containerPort: 8060
+
+      volumes:
+        - name: secrets
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: myapp-aws-secrets
