@@ -86,6 +86,26 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   role       = aws_iam_role.eks_nodes.name
 }
 
+data "aws_eks_cluster_auth" "cluster" {
+  name = aws_eks_cluster.main.name
+}
+
+# Configure the Kubernetes provider
+provider "kubernetes" {
+  host                   = aws_eks_cluster.main.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
+
+# Configure the Helm provider
+provider "helm" {
+  kubernetes {
+    host                   = aws_eks_cluster.main.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.cluster.token
+  }
+}
+
 resource "helm_release" "secrets_csi_driver" {
   name       = "secrets-store-csi-driver"
   repository = "https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts"
@@ -98,6 +118,7 @@ resource "helm_release" "secrets_csi_driver" {
     value = true
   }
 
+  depends_on = [aws_eks_node_group.main]
 }
 
 resource "helm_release" "secrets_csi_driver_aws_provider" {
@@ -107,6 +128,7 @@ resource "helm_release" "secrets_csi_driver_aws_provider" {
   namespace  = "kube-system"
   version    = "0.3.9"
 
+  depends_on = [helm_release.secrets_csi_driver]
 }
 
 resource "aws_iam_openid_connect_provider" "eks" {
@@ -168,3 +190,4 @@ data "tls_certificate" "eks" {
 output "myapp_secrets_role_arn" {
   value = aws_iam_role.myapp_secrets.arn
 }
+
