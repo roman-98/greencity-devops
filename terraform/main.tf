@@ -50,5 +50,5 @@ variable "password" {
 
 output "rds_endpoint" {
   description = "The endpoint of the RDS instance."
-  value       = module.rds.aws_db_instance.greencity.endpoint
+  value       = [module.rds.aws_db_instance.greencity.endpoint]
 }
