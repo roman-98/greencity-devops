@@ -47,8 +47,3 @@ variable "password" {
   type        = string
   sensitive   = true
 }
-
-output "rds_endpoint" {
-  description = "The endpoint of the RDS instance."
-  value       = [module.rds.aws_db_instance.greencity.endpoint]
-}
