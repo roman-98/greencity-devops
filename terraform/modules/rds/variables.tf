@@ -1,7 +1,7 @@
 variable "identifier" {
   description = "The identifier for the RDS instance."
   type        = string
-  default = "greencity-database"
+  default = "greencity"
 }
 
 variable "engine" {

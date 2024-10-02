@@ -94,13 +94,21 @@ resource "helm_release" "secrets_csi_driver" {
   namespace  = "kube-system"
   version    = "1.4.3"
 
-  # MUST be set if you use ENV variables
   set {
     name  = "syncSecret.enabled"
     value = true
   }
 
-  depends_on = [helm_release.efs_csi_driver]
+}
+
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.main.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }
 
 resource "helm_release" "secrets_csi_driver_aws_provider" {
@@ -133,12 +141,12 @@ data "aws_iam_policy_document" "myapp_secrets" {
 }
 
 resource "aws_iam_role" "myapp_secrets" {
-  name               = "${aws_eks_cluster.eks.name}-myapp-secrets"
+  name               = "${var.cluster_name}-myapp-secrets"
   assume_role_policy = data.aws_iam_policy_document.myapp_secrets.json
 }
 
 resource "aws_iam_policy" "myapp_secrets" {
-  name = "${aws_eks_cluster.eks.name}-myapp-secrets"
+  name = "${var.cluster_name}-myapp-secrets"
 
   policy = jsonencode({
     Version = "2012-10-17"
