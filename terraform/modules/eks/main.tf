@@ -87,8 +87,7 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
 }
 
 resource "helm_release" "secrets_csi_driver" {
-  name = "secrets-store-csi-driver"
-
+  name       = "secrets-store-csi-driver"
   repository = "https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts"
   chart      = "secrets-store-csi-driver"
   namespace  = "kube-system"
@@ -99,31 +98,23 @@ resource "helm_release" "secrets_csi_driver" {
     value = true
   }
 
-}
-
-provider "kubernetes" {
-  host                   = aws_eks_cluster.main.endpoint
-  cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.main.token
-}
-
-data "aws_eks_cluster_auth" "main" {
-  name = aws_eks_cluster.main.name
-}
-
-data "tls_certificate" "eks" {
-  url = aws_eks_cluster.main.identity[0].oidc[0].issuer
+  depends_on = [aws_eks_node_group.main]
 }
 
 resource "helm_release" "secrets_csi_driver_aws_provider" {
-  name = "secrets-store-csi-driver-provider-aws"
-
+  name       = "secrets-store-csi-driver-provider-aws"
   repository = "https://aws.github.io/secrets-store-csi-driver-provider-aws"
   chart      = "secrets-store-csi-driver-provider-aws"
   namespace  = "kube-system"
   version    = "0.3.9"
 
   depends_on = [helm_release.secrets_csi_driver]
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }
 
 data "aws_iam_policy_document" "myapp_secrets" {
@@ -134,7 +125,7 @@ data "aws_iam_policy_document" "myapp_secrets" {
     condition {
       test     = "StringEquals"
       variable = "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub"
-      values   = ["system:serviceaccount:12-example:myapp"]
+      values   = ["system:serviceaccount:prod:myapp"]
     }
 
     principals {
@@ -145,12 +136,12 @@ data "aws_iam_policy_document" "myapp_secrets" {
 }
 
 resource "aws_iam_role" "myapp_secrets" {
-  name               = "${var.cluster_name}-myapp-secrets"
+  name               = "${aws_eks_cluster.main.name}-myapp-secrets"
   assume_role_policy = data.aws_iam_policy_document.myapp_secrets.json
 }
 
 resource "aws_iam_policy" "myapp_secrets" {
-  name = "${var.cluster_name}-myapp-secrets"
+  name = "${aws_eks_cluster.main.name}-myapp-secrets"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -161,7 +152,7 @@ resource "aws_iam_policy" "myapp_secrets" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = "*" # "arn:*:secretsmanager:*:*:secret:my-secret-kkargS"
+        Resource = "*"
       }
     ]
   })
@@ -170,6 +161,10 @@ resource "aws_iam_policy" "myapp_secrets" {
 resource "aws_iam_role_policy_attachment" "myapp_secrets" {
   policy_arn = aws_iam_policy.myapp_secrets.arn
   role       = aws_iam_role.myapp_secrets.name
+}
+
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }
 
 output "myapp_secrets_role_arn" {

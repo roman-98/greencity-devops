@@ -26,6 +26,18 @@ module "eks" {
   depends_on = [module.rds]
 }
 
+provider "helm" {
+  kubernetes {
+    host                   = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_ca_certificate)
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
+      command     = "aws"
+    }
+  }
+}
+
 variable "username" {
   description = "The master username for the DB instance."
   type        = string
@@ -35,4 +47,9 @@ variable "password" {
   description = "The master password for the DB instance."
   type        = string
   sensitive   = true
+}
+
+output "rds_endpoint" {
+  description = "The endpoint of the RDS instance."
+  value       = module.rds.aws_db_instance.greencity.endpoint
 }
