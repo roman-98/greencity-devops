@@ -21,10 +21,6 @@ terraform {
       version = ">= 1.7.0"
     }
 
-    helm = {
-      source  = "hashicorp/helm"
-      version = ">= 2.15.0"
-    }
   }
 
 backend "remote" {
