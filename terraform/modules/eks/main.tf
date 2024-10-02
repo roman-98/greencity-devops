@@ -98,7 +98,7 @@ resource "helm_release" "secrets_csi_driver" {
     value = true
   }
 
-  depends_on = [aws_eks_node_group.main]
+  depends_on = [aws_eks_node_group.main, aws_iam_openid_connect_provider.eks]
 }
 
 resource "helm_release" "secrets_csi_driver_aws_provider" {
