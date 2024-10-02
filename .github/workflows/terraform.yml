@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - tf-changes
+    paths-ignore:
+      - 'helm/**'
+      - 'k8s/**'
+      - 'README.md'
   workflow_dispatch:
 
 jobs:
