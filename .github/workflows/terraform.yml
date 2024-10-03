@@ -8,6 +8,8 @@ on:
       - 'helm/**'
       - 'k8s/**'
       - 'README.md'
+      - 'img/**'
+      - '.github/**'
   workflow_dispatch:
 
 jobs:
