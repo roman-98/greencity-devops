@@ -9,7 +9,7 @@ on:
       - 'k8s/**'
       - 'README.md'
       - 'img/**'
-      - '.github/**'
+      #- '.github/**'
   workflow_dispatch:
 
 jobs:

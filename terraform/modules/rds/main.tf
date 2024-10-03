@@ -13,3 +13,20 @@ resource "aws_db_instance" "greencity" {
 
   tags = var.tags
 }
+
+resource "aws_secretsmanager_secret" "greencity_secrets" {
+  name = "prod/greencity-secrets-v1"
+
+  depends_on = [aws_db_instance.greencity]
+}
+
+resource "aws_secretsmanager_secret_version" "greencity_secrets_v1" {
+  secret_id     = aws_secretsmanager_secret.greencity_secrets.id
+
+  secret_string = jsonencode({
+    DATASOURCE_URL = format("jdbc:postgresql://%s:5432/greencity", aws_db_instance.greencity.endpoint)
+  })
+
+  depends_on = [aws_secretsmanager_secret.greencity_secrets]
+}
+
