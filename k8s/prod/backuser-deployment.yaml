@@ -19,10 +19,6 @@ spec:
       containers:
         - name: greencity-backuser
           image: ghcr.io/roman-98/greencity-backuser:1.0.0-bb6e0a3
-          volumeMounts:
-            - name: secrets
-              mountPath: /mnt/secrets
-              readOnly: true
           env:
             - name: DATASOURCE_URL
               valueFrom:
@@ -155,11 +151,3 @@ spec:
 
           ports:
             - containerPort: 8060
-
-      volumes:
-        - name: secrets
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: myapp-aws-secrets
