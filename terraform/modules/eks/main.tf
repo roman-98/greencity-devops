@@ -93,19 +93,19 @@ provider "kubernetes" {
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_id
+  name = aws_eks_cluster.main.name
 }
 
 output "cluster_endpoint" {
-  value = module.eks.cluster_endpoint
+  value       = aws_eks_cluster.main.endpoint
 }
 
 output "cluster_ca_certificate" {
-  value = module.eks.cluster_certificate_authority_data
+  value       = aws_eks_cluster.main.certificate_authority[0].data
 }
 
 output "cluster_id" {
-  value = module.eks.cluster_id
+  value       = aws_eks_cluster.main.id
 }
 
 data "tls_certificate" "eks" {
