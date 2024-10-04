@@ -150,6 +150,11 @@ data "aws_secretsmanager_secret_version" "myapp_secrets" {
   secret_id = "prod/greencity-secrets-v1"
 }
 
+output "secret_content" {
+  value = jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)
+  sensitive = true
+}
+
 resource "kubernetes_secret" "myapp_k8s_secret" {
   metadata {
     name      = "myapp-k8s-secret"
@@ -157,26 +162,27 @@ resource "kubernetes_secret" "myapp_k8s_secret" {
   }
 
   data = {
-    datasourceUser                = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["DATASOURCE_USER"])
-    datasourcePassword            = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["DATASOURCE_PASSWORD"])
-    emailAddress                  = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["EMAIL_ADDRESS"])
-    emailPassword                 = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["EMAIL_PASSWORD"])
-    googleClientId                = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["GOOGLE_CLIENT_ID"])
-    googleApiKey                  = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["GOOGLE_API_KEY"])
-    googleClientIdManager         = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["GOOGLE_CLIENT_ID_MANAGER"])
-    cloudName                     = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["CLOUD_NAME"])
-    apiKey                        = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["API_KEY"])
-    apiSecret                     = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["API_SECRET"])
-    maxFileSize                   = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["MAX_FILE_SIZE"])
-    maxRequestSize                = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["MAX_REQUEST_SIZE"])
-    bucketName                    = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["BUCKET_NAME"])
-    staticUrl                     = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["STATIC_URL"])
-    googleApplicationCredentials  = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["GOOGLE_APPLICATION_CREDENTIALS"])
-    defaultProfilePicture         = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["DEFAULT_PROFILE_PICTURE"])
-    azureConnectionString         = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["AZURE_CONNECTION_STRING"])
-    azureContainerName            = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["AZURE_CONTAINER_NAME"])
-    endpointSuffix                = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["EndpointSuffix"])
-    chatLink                      = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["CHAT_LINK"])
-    profile                       = base64encode(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)["PROFILE"])
+    datasourceUrl                 = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DATASOURCE_URL", ""))
+    datasourceUser                = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DATASOURCE_USER", ""))
+    datasourcePassword            = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DATASOURCE_PASSWORD", ""))
+    emailAddress                  = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "EMAIL_ADDRESS", ""))
+    emailPassword                 = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "EMAIL_PASSWORD", ""))
+    googleClientId                = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "GOOGLE_CLIENT_ID", ""))
+    googleApiKey                  = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "GOOGLE_API_KEY", ""))
+    googleClientIdManager         = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "GOOGLE_CLIENT_ID_MANAGER", ""))
+    cloudName                     = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "CLOUD_NAME", ""))
+    apiKey                        = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "API_KEY", ""))
+    apiSecret                     = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "API_SECRET", ""))
+    maxFileSize                   = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "MAX_FILE_SIZE", ""))
+    maxRequestSize                = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "MAX_REQUEST_SIZE", ""))
+    bucketName                    = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "BUCKET_NAME", ""))
+    staticUrl                     = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "STATIC_URL", ""))
+    googleApplicationCredentials  = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "GOOGLE_APPLICATION_CREDENTIALS", ""))
+    defaultProfilePicture         = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DEFAULT_PROFILE_PICTURE", ""))
+    azureConnectionString         = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "AZURE_CONNECTION_STRING", ""))
+    azureContainerName            = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "AZURE_CONTAINER_NAME", ""))
+    endpointSuffix                = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "EndpointSuffix", ""))
+    chatLink                      = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "CHAT_LINK", ""))
+    profile                       = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "PROFILE", ""))
   }
 }
