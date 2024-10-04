@@ -144,6 +144,8 @@ resource "kubernetes_service_account" "myapp" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.myapp_secrets.arn
     }
   }
+
+  depends_on = [aws_eks_node_group.main]
 }
 
 data "aws_secretsmanager_secret_version" "myapp_secrets" {
@@ -153,6 +155,8 @@ data "aws_secretsmanager_secret_version" "myapp_secrets" {
 output "secret_content" {
   value = jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)
   sensitive = true
+
+  depends_on = [aws_eks_node_group.main]
 }
 
 resource "kubernetes_secret" "myapp_k8s_secret" {
@@ -185,4 +189,6 @@ resource "kubernetes_secret" "myapp_k8s_secret" {
     chatLink                      = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "CHAT_LINK", ""))
     profile                       = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "PROFILE", ""))
   }
+
+  depends_on = [aws_eks_node_group.main]
 }
