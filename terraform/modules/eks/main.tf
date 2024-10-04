@@ -170,7 +170,7 @@ resource "aws_iam_policy" "myapp_secrets" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = "*"
+        Resource = "arn:aws:secretsmanager:eu-west-3:730335226605:secret:prod/greencity-secrets-v1-JCNLwZ"
       }
     ]
   })
