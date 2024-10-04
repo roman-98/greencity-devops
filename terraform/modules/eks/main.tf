@@ -96,6 +96,18 @@ data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_id
 }
 
+output "cluster_endpoint" {
+  value = module.eks.cluster_endpoint
+}
+
+output "cluster_ca_certificate" {
+  value = module.eks.cluster_certificate_authority_data
+}
+
+output "cluster_id" {
+  value = module.eks.cluster_id
+}
+
 data "tls_certificate" "eks" {
   url = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }
