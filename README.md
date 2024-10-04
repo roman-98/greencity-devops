@@ -6,6 +6,7 @@
   <code><img width="80" src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white"/></code>
   <code><img width="110" src="https://img.shields.io/badge/kubernetes-326ce5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white"/></code>
 	<code><img width="121" src="https://img.shields.io/badge/Prometheus-000000?style=for-the-badge&logo=prometheus&labelColor=000000"/></code>
+  <code><img width="85" src="https://img.shields.io/badge/Datadog-632CA6?style=for-the-badge&logo=datadog&logoColor=white"/></code>
 	<code><img width="110" src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white"/></code>
   <code><img width="95" src="https://img.shields.io/badge/GNU%20Bash-4EAA25?style=for-the-badge&logo=GNU%20Bash&logoColor=white"/></code>
   <code><img width="59" src="https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=white"/></code>
@@ -17,7 +18,7 @@
 <br />
 <div align="center">
     <img src="./img/life-cycle-of-devops.png" width="169" height="92">
-  <h3 align="center">SoftServe DevOps Development </h3>
+  <h3 align="center">SoftServe DevOps Development</h3>
 
   <p align="center">
     GreenCity

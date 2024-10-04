@@ -21,7 +21,10 @@ spec:
           image: ghcr.io/roman-98/greencity-backcore:1.0.0-bb6e0a3
           env:
             - name: DATASOURCE_URL
-              value: jdbc:postgresql://postgres-service:5432/greencity
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: datasource-url
     
             - name: DATASOURCE_USER
               valueFrom:
@@ -148,11 +151,3 @@ spec:
                   
           ports:
             - containerPort: 8080
-
-      volumes:
-        - name: secrets
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: myapp-aws-secrets

@@ -86,92 +86,138 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   role       = aws_iam_role.eks_nodes.name
 }
 
-resource "helm_release" "secrets_csi_driver" {
-  name = "secrets-store-csi-driver"
-
-  repository = "https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts"
-  chart      = "secrets-store-csi-driver"
-  namespace  = "kube-system"
-  version    = "1.4.3"
-
-  set {
-    name  = "syncSecret.enabled"
-    value = true
-  }
-
-}
-
 provider "kubernetes" {
   host                   = aws_eks_cluster.main.endpoint
   cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.main.token
+  token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
-data "aws_eks_cluster_auth" "main" {
+data "aws_eks_cluster_auth" "cluster" {
   name = aws_eks_cluster.main.name
+}
+
+output "cluster_ca_certificate" {
+  value       = aws_eks_cluster.main.certificate_authority[0].data
+}
+
+output "cluster_id" {
+  value       = aws_eks_cluster.main.id
 }
 
 data "tls_certificate" "eks" {
   url = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }
 
-resource "helm_release" "secrets_csi_driver_aws_provider" {
-  name = "secrets-store-csi-driver-provider-aws"
-
-  repository = "https://aws.github.io/secrets-store-csi-driver-provider-aws"
-  chart      = "secrets-store-csi-driver-provider-aws"
-  namespace  = "kube-system"
-  version    = "0.3.9"
-
-  depends_on = [helm_release.secrets_csi_driver]
-}
-
-data "aws_iam_policy_document" "myapp_secrets" {
-  statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    effect  = "Allow"
-
-    condition {
-      test     = "StringEquals"
-      variable = "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub"
-      values   = ["system:serviceaccount:12-example:myapp"]
-    }
-
-    principals {
-      identifiers = [aws_iam_openid_connect_provider.eks.arn]
-      type        = "Federated"
-    }
-  }
+resource "aws_iam_openid_connect_provider" "eks" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }
 
 resource "aws_iam_role" "myapp_secrets" {
-  name               = "${var.cluster_name}-myapp-secrets"
-  assume_role_policy = data.aws_iam_policy_document.myapp_secrets.json
-}
+  name = "${aws_eks_cluster.main.name}-myapp-secrets"
 
-resource "aws_iam_policy" "myapp_secrets" {
-  name = "${var.cluster_name}-myapp-secrets"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow"
-        Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
-        ]
-        Resource = "*" # "arn:*:secretsmanager:*:*:secret:my-secret-kkargS"
+        Effect = "Allow",
+        Principal = {
+          Federated: aws_iam_openid_connect_provider.eks.id
+        },
+        Action: "sts:AssumeRoleWithWebIdentity",
+        Condition: {
+          StringEquals: {
+            "${replace(aws_eks_cluster.main.identity[0].oidc[0].issuer, "https://", "")}:sub": "system:serviceaccount:prod:myapp"
+          }
+        }
       }
     ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "myapp_secrets" {
-  policy_arn = aws_iam_policy.myapp_secrets.arn
+resource "aws_iam_policy" "myapp_secrets_policy" {
+  name = "${aws_eks_cluster.main.name}-myapp-secrets-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ],
+        Resource = "arn:aws:secretsmanager:eu-west-3:730335226605:secret:prod/greencity-secrets-v1-JCNLwZ"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "myapp_secrets_policy_attachment" {
+  policy_arn = aws_iam_policy.myapp_secrets_policy.arn
   role       = aws_iam_role.myapp_secrets.name
 }
 
-output "myapp_secrets_role_arn" {
-  value = aws_iam_role.myapp_secrets.arn
+resource "kubernetes_namespace" "prod" {
+  metadata {
+    name = "prod"
+  }
+}
+
+resource "kubernetes_service_account" "myapp" {
+  metadata {
+    name      = "myapp"
+    namespace = "prod"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.myapp_secrets.arn
+    }
+  }
+
+  depends_on = [kubernetes_namespace.prod]
+}
+
+data "aws_secretsmanager_secret_version" "myapp_secrets" {
+  secret_id = "prod/greencity-secrets-v1"
+}
+
+output "secret_content" {
+  value = jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)
+  sensitive = true
+
+  depends_on = [aws_eks_node_group.main]
+}
+
+resource "kubernetes_secret" "myapp_k8s_secret" {
+  metadata {
+    name      = "myapp-k8s-secret"
+    namespace = "prod"
+  }
+
+  data = {
+    datasourceUrl                 = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DATASOURCE_URL", ""))
+    datasourceUser                = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DATASOURCE_USER", ""))
+    datasourcePassword            = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DATASOURCE_PASSWORD", ""))
+    emailAddress                  = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "EMAIL_ADDRESS", ""))
+    emailPassword                 = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "EMAIL_PASSWORD", ""))
+    googleClientId                = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "GOOGLE_CLIENT_ID", ""))
+    googleApiKey                  = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "GOOGLE_API_KEY", ""))
+    googleClientIdManager         = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "GOOGLE_CLIENT_ID_MANAGER", ""))
+    cloudName                     = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "CLOUD_NAME", ""))
+    apiKey                        = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "API_KEY", ""))
+    apiSecret                     = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "API_SECRET", ""))
+    maxFileSize                   = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "MAX_FILE_SIZE", ""))
+    maxRequestSize                = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "MAX_REQUEST_SIZE", ""))
+    bucketName                    = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "BUCKET_NAME", ""))
+    staticUrl                     = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "STATIC_URL", ""))
+    googleApplicationCredentials  = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "GOOGLE_APPLICATION_CREDENTIALS", ""))
+    defaultProfilePicture         = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DEFAULT_PROFILE_PICTURE", ""))
+    azureConnectionString         = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "AZURE_CONNECTION_STRING", ""))
+    azureContainerName            = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "AZURE_CONTAINER_NAME", ""))
+    endpointSuffix                = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "EndpointSuffix", ""))
+    chatLink                      = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "CHAT_LINK", ""))
+    profile                       = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "PROFILE", ""))
+  }
+
+  depends_on = [kubernetes_namespace.prod]
 }
