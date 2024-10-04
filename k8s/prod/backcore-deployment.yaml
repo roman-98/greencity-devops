@@ -19,6 +19,10 @@ spec:
       containers:
         - name: greencity-backcore
           image: ghcr.io/roman-98/greencity-backcore:1.0.0-bb6e0a3
+          volumeMounts:
+            - name: secrets
+              mountPath: /mnt/secrets
+              readOnly: true
           env:
             - name: DATASOURCE_URL
               valueFrom:
