@@ -87,8 +87,8 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
 }
 
 provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  host                   = aws_eks_cluster.main_endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority_data)
   token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
