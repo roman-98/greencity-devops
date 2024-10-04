@@ -159,6 +159,12 @@ resource "aws_iam_role_policy_attachment" "myapp_secrets_policy_attachment" {
   role       = aws_iam_role.myapp_secrets.name
 }
 
+resource "kubernetes_namespace" "prod" {
+  metadata {
+    name = "prod"
+  }
+}
+
 resource "kubernetes_service_account" "myapp" {
   metadata {
     name      = "myapp"
@@ -168,7 +174,7 @@ resource "kubernetes_service_account" "myapp" {
     }
   }
 
-  depends_on = [aws_eks_node_group.main]
+  depends_on = [kubernetes_namespace.prod]
 }
 
 data "aws_secretsmanager_secret_version" "myapp_secrets" {
@@ -213,5 +219,5 @@ resource "kubernetes_secret" "myapp_k8s_secret" {
     profile                       = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "PROFILE", ""))
   }
 
-  depends_on = [aws_eks_node_group.main]
+  depends_on = [kubernetes_namespace.prod]
 }
