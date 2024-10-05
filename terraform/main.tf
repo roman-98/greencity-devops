@@ -33,7 +33,7 @@ module "eks" {
   private_subnet_b_id   = module.vpc.private_subnet_b_id
   eks_security_group_id = module.vpc.eks_security_group_id
 
-  depends_on = [module.rds_endpoint]
+  depends_on = [module.rds]
 }
 
 provider "helm" {
