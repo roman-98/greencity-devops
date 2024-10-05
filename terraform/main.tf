@@ -16,16 +16,6 @@ module "rds" {
 
 }
 
-resource "aws_secretsmanager_secret_version" "greencity_secrets_v1" {
-  secret_id     = "prod/greencity-secrets-v1"
-
-  secret_string = jsonencode({
-    DATASOURCE_URL = format("jdbc:postgresql://%s/greencity", module.rds_endpoint)
-  })
-
-  depends_on = [module.rds]
-}
-
 module "eks" {
   source = "./modules/eks"
 
