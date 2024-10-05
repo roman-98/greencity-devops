@@ -177,12 +177,16 @@ resource "kubernetes_service_account" "myapp" {
   depends_on = [kubernetes_namespace.prod]
 }
 
-data "aws_secretsmanager_secret_version" "myapp_secrets" {
+data "aws_secretsmanager_secret_version" "db_secret" {
   secret_id = "prod/greencity-secrets-v1"
 }
 
+data "aws_secretsmanager_secret_version" "myapp_secrets" {
+  secret_id = "prod/greencity-secrets-v2"
+}
+
 output "secret_content" {
-  value = jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)
+  value = jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string, data.aws_secretsmanager_secret_version.db_secret.secret_string)
   sensitive = true
 
   depends_on = [aws_eks_node_group.main]
@@ -195,7 +199,7 @@ resource "kubernetes_secret" "myapp_k8s_secret" {
   }
 
   data = {
-    datasourceUrl                 = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DATASOURCE_URL", ""))
+    datasourceUrl                 = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.db_secret.secret_string), "DATASOURCE_URL", ""))
     datasourceUser                = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DATASOURCE_USER", ""))
     datasourcePassword            = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "DATASOURCE_PASSWORD", ""))
     emailAddress                  = base64encode(lookup(jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string), "EMAIL_ADDRESS", ""))
