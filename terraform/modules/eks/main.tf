@@ -185,8 +185,16 @@ data "aws_secretsmanager_secret_version" "myapp_secrets" {
   secret_id = "prod/greencity-secrets-v2"
 }
 
+locals {
+  myapp_secrets  = jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string)
+  db_secret      = jsondecode(data.aws_secretsmanager_secret_version.db_secret.secret_string)
+}
+
 output "secret_content" {
-  value = jsondecode(data.aws_secretsmanager_secret_version.myapp_secrets.secret_string, data.aws_secretsmanager_secret_version.db_secret.secret_string)
+  value = {
+    myapp_secrets = local.myapp_secrets
+    db_secret     = local.db_secret
+  }
   sensitive = true
 
   depends_on = [aws_eks_node_group.main]
