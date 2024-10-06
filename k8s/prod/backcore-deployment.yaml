@@ -21,138 +21,136 @@ spec:
           image: ghcr.io/roman-98/greencity-backcore:1.0.0-bb6e0a3
           env:
             - name: DATASOURCE_URL
-              value: jdbc:postgresql://postgres-service:5432/greencity
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: datasourceUrl
     
             - name: DATASOURCE_USER
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-datasource-user
+                  key: datasourceUser
   
             - name: DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-datasource-password
+                  key: datasourcePassword
   
             - name: EMAIL_ADDRESS
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-email-address
+                  key: emailAddress
   
             - name: EMAIL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-email-password
+                  key: emailPassword
 
             - name: GOOGLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-google-client-id
+                  key: googleClientId
 
             - name: GOOGLE_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-google-api-key
+                  key: googleApiKey
 
             - name: GOOGLE_CLIENT_ID_MANAGER
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-google-client-id-manager
+                  key: googleClientIdManager
 
             - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /app/google-creds.json
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: googleApplicationCredentials
 
             - name: CLOUD_NAME
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-cloud-name
+                  key: cloudName
   
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-api-key
+                  key: apiKey
   
             - name: API_SECRET
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-api-secret
+                  key: apiSecret
   
             - name: MAX_FILE_SIZE
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-max-file-size
+                  key: maxFileSize
   
             - name: MAX_REQUEST_SIZE
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-max-request-size
+                  key: maxRequestSize
 
             - name: BUCKET_NAME
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-bucket-name
+                  key: bucketName
 
             - name: STATIC_URL
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-static-url
+                  key: staticUrl
 
             - name: DEFAULT_PROFILE_PICTURE
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-default-profile-picture
+                  key: defaultProfilePicture
 
             - name: AZURE_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-azure-connection-string
+                  key: azureConnectionString
 
             - name: AZURE_CONTAINER_NAME
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-azure-container-name
+                  key: azureContainerName
 
             - name: EndpointSuffix
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-endpoint-suffix
+                  key: endpointSuffix
 
             - name: CHAT_LINK
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-chat-link
+                  key: chatLink
 
             - name: PROFILE
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: k8s-profile
+                  key: profile
                   
           ports:
             - containerPort: 8080
-
-      volumes:
-        - name: secrets
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: myapp-aws-secrets
