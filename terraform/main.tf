@@ -8,8 +8,8 @@ module "rds" {
   username             = var.username  
   password             = var.password 
 
-  vpc_security_group_ids = module.vpc.rds_security_group_id
-  subnet_group_name      = module.vpc.rds_subnet_group_name
+  vpc_security_group_ids = [module.vpc.rds_security_group.id]
+  subnet_group_name      = module.vpc.rds_subnet_group.name
   subnet_ids             = [
     module.vpc.private_subnet_a_id,
     module.vpc.private_subnet_b_id
