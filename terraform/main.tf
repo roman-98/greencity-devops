@@ -2,21 +2,21 @@ module "vpc" {
   source = "./modules/vpc"
 }
 
-#module "rds" {
- # source = "./modules/rds"
+module "rds" {
+  source = "./modules/rds"
 
- # username             = var.username  
- # password             = var.password 
+  username             = var.username  
+  password             = var.password 
 
- # vpc_security_group_ids = module.vpc.rds_security_group_id
- # subnet_group_name      = module.vpc.rds_subnet_group_name
- # subnet_ids             = [
-  #  module.vpc.private_subnet_a_id,
-  #  module.vpc.private_subnet_b_id
-  #]
+  vpc_security_group_ids = module.vpc.rds_security_group_id
+  subnet_group_name      = module.vpc.rds_subnet_group_name
+  subnet_ids             = [
+    module.vpc.private_subnet_a_id,
+    module.vpc.private_subnet_b_id
+  ]
 
-  #depends_on = [module.vpc]
-#}
+  depends_on = [module.vpc]
+}
 
 module "eks" {
   source = "./modules/eks"
