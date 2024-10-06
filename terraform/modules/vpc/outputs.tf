@@ -40,11 +40,10 @@ output "eks_security_group_id" {
 
 output "rds_security_group_id" {
   description = "The security group ID for RDS."
-  value       = [aws_security_group.rds_sg.id]
+  value       = aws_security_group.rds_sg.id
 }
 
 output "rds_subnet_group_name" {
-  description = "The subnet group name for RDS."
+  description = "The name of the DB subnet group."
   value       = aws_db_subnet_group.my_db_subnet_group.name
 }
-

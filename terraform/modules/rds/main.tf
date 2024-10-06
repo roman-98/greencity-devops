@@ -10,7 +10,8 @@ resource "aws_db_instance" "greencity" {
   db_name                 = var.db_name
   skip_final_snapshot     = var.skip_final_snapshot
   multi_az                = var.multi_az
-
+  vpc_security_group_ids  = var.vpc_security_group_ids
+  db_subnet_group_name    = var.subnet_group_name 
   tags = var.tags
 }
 
@@ -18,7 +19,7 @@ resource "aws_secretsmanager_secret_version" "greencity_secrets_v1" {
   secret_id     = "prod/greencity-secrets-v1"
 
   secret_string = jsonencode({
-    DATASOURCE_URL = format("jdbc:postgresql://%s/greencity", aws_db_instance.greencity.endpoint)
+    DATASOURCE_URL = format("jdbc:postgresql://%s/greencity?sslmode=disable", aws_db_instance.greencity.endpoint)
   })
 
   depends_on = [aws_db_instance.greencity]

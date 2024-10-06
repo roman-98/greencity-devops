@@ -14,6 +14,8 @@ resource "aws_subnet" "private_subnet_a" {
   tags = {
     Name = "private_subnet_a"
   }
+
+  depends_on = [aws_vpc.this]
 }
 
 resource "aws_subnet" "private_subnet_b" {
@@ -24,6 +26,8 @@ resource "aws_subnet" "private_subnet_b" {
   tags = {
     Name = "private_subnet_b"
   }
+
+  depends_on = [aws_subnet.private_subnet_a]
 }
 
 resource "aws_subnet" "public_subnet_a" {
@@ -34,6 +38,8 @@ resource "aws_subnet" "public_subnet_a" {
   tags = {
     Name = "public_subnet_a"
   }
+
+  depends_on = [aws_subnet.private_subnet_b]
 }
 
 resource "aws_subnet" "public_subnet_b" {
@@ -44,6 +50,8 @@ resource "aws_subnet" "public_subnet_b" {
   tags = {
     Name = "public_subnet_b"
   }
+
+  depends_on = [aws_subnet.public_subnet_a]
 }
 
 resource "aws_internet_gateway" "this" {
@@ -51,6 +59,8 @@ resource "aws_internet_gateway" "this" {
   tags = {
     Name = "${var.vpc_name}-igw"
   }
+
+  depends_on = [aws_subnet.public_subnet_b]
 }
 
 resource "aws_eip" "nat" {
@@ -58,6 +68,8 @@ resource "aws_eip" "nat" {
   tags = {
     Name = "${var.vpc_name}-nat-eip"
   }
+
+  depends_on = [aws_internet_gateway.this]
 }
 
 resource "aws_nat_gateway" "this" {
@@ -66,6 +78,8 @@ resource "aws_nat_gateway" "this" {
   tags = {
     Name = "${var.vpc_name}-nat-gw"
   }
+
+  depends_on = [aws_eip.nat]
 }
 
 resource "aws_route_table" "public" {
@@ -77,9 +91,10 @@ resource "aws_route_table" "public" {
   tags = {
     Name = "${var.vpc_name}-public-rt"
   }
+
+  depends_on = [aws_nat_gateway.this]
 }
 
-# Таблиця маршрутизації для приватних підмереж
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.this.id
   route {
@@ -89,26 +104,36 @@ resource "aws_route_table" "private" {
   tags = {
     Name = "${var.vpc_name}-private-rt"
   }
+
+  depends_on = [aws_route_table.public]
 }
 
 resource "aws_route_table_association" "public_a" {
   subnet_id      = aws_subnet.public_subnet_a.id
   route_table_id = aws_route_table.public.id
+
+  depends_on = [aws_route_table.private]
 }
 
 resource "aws_route_table_association" "public_b" {
   subnet_id      = aws_subnet.public_subnet_b.id
   route_table_id = aws_route_table.public.id
+
+  depends_on = [aws_route_table_association.public_a]
 }
 
 resource "aws_route_table_association" "private_a" {
   subnet_id      = aws_subnet.private_subnet_a.id
   route_table_id = aws_route_table.private.id
+
+  depends_on = [aws_route_table_association.public_b]
 }
 
 resource "aws_route_table_association" "private_b" {
   subnet_id      = aws_subnet.private_subnet_b.id
   route_table_id = aws_route_table.private.id
+
+  depends_on = [aws_route_table_association.private_a]
 }
 
 resource "aws_security_group" "eks_sg" {
@@ -138,6 +163,8 @@ resource "aws_security_group" "eks_sg" {
   tags = {
     Name = "eks_security_group"
   }
+
+  depends_on = [aws_route_table_association.private_b]
 }
 
 resource "aws_security_group" "rds_sg" {
@@ -160,6 +187,8 @@ resource "aws_security_group" "rds_sg" {
   tags = {
     Name = "rds_security_group"
   }
+
+  depends_on = [aws_security_group.eks_sg]
 }
 
 resource "aws_db_subnet_group" "my_db_subnet_group" {
@@ -171,6 +200,8 @@ resource "aws_db_subnet_group" "my_db_subnet_group" {
   tags = {
     Name = "my_db_subnet_group"
   }
+
+  depends_on = [aws_security_group.rds_sg]
 }
 
 
