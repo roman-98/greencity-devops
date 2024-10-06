@@ -1,0 +1,156 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backcore-deployment
+  namespace: prod
+  labels:
+    app: backcore
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backcore
+  template:
+    metadata:
+      labels:
+        app: backcore
+    spec:
+      serviceAccountName: myapp
+      containers:
+        - name: greencity-backcore
+          image: ghcr.io/roman-98/greencity-backcore:{{ .Values.image.tag  }}
+          env:
+            - name: DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: datasourceUrl
+    
+            - name: DATASOURCE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: datasourceUser
+  
+            - name: DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: datasourcePassword
+  
+            - name: EMAIL_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: emailAddress
+  
+            - name: EMAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: emailPassword
+
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: googleClientId
+
+            - name: GOOGLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: googleApiKey
+
+            - name: GOOGLE_CLIENT_ID_MANAGER
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: googleClientIdManager
+
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: googleApplicationCredentials
+
+            - name: CLOUD_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: cloudName
+  
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: apiKey
+  
+            - name: API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: apiSecret
+  
+            - name: MAX_FILE_SIZE
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: maxFileSize
+  
+            - name: MAX_REQUEST_SIZE
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: maxRequestSize
+
+            - name: BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: bucketName
+
+            - name: STATIC_URL
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: staticUrl
+
+            - name: DEFAULT_PROFILE_PICTURE
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: defaultProfilePicture
+
+            - name: AZURE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: azureConnectionString
+
+            - name: AZURE_CONTAINER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: azureContainerName
+
+            - name: EndpointSuffix
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: endpointSuffix
+
+            - name: CHAT_LINK
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: chatLink
+
+            - name: PROFILE
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: profile
+                  
+          ports:
+            - containerPort: 8080
