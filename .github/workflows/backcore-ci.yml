@@ -1,0 +1,89 @@
+name: Backcore CI
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'helm/**'
+      - 'k8s/**'
+      - 'README.md'
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  setup:
+    name: Setup Environment
+    runs-on: ubuntu-latest
+    environment: CI
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY_BACKCORE }}
+      - name: Configure SSH for GitHub
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY_BACKCORE }}" > ~/.ssh/id_backcore
+          chmod 600 ~/.ssh/id_backcore
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          echo -e "Host github.com-backcore\n HostName github.com\n User git\n IdentityFile ~/.ssh/id_backcore\n" >> ~/.ssh/config
+      - name: Cache SSH configuration
+        uses: actions/cache@v3
+        with:
+          path: ~/.ssh
+          key: ${{ runner.os }}-ssh-${{ hashFiles('~/.ssh/**') }}
+          restore-keys: |
+            ${{ runner.os }}-ssh-
+
+  clone_repository:
+    name: Clone Backcore Repository
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore SSH configuration
+        uses: actions/cache@v3
+        with:
+          path: ~/.ssh
+          key: ${{ runner.os }}-ssh-${{ hashFiles('~/.ssh/**') }}
+      - name: Checkout backcore repo
+        run: |
+          git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git greencity-backcore-roman-98
+      - name: Cache backcore repository
+        uses: actions/cache@v3
+        with:
+          path: greencity-backcore-roman-98
+          key: ${{ runner.os }}-repo-backcore-${{ github.sha }}
+
+  build_and_push:
+    name: Build and Push Backcore
+    needs: clone_repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore backcore repository
+        uses: actions/cache@v3
+        with:
+          path: greencity-backcore-roman-98
+          key: ${{ runner.os }}-repo-backcore-${{ github.sha }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      - name: Set version
+        run: echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
+      - name: Build and push backcore image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./greencity-backcore-roman-98
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

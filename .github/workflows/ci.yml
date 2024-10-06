@@ -1,13 +1,13 @@
 name: GreenCity-CI
 
-on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'helm/**'
-      - 'k8s/**'
-      - 'README.md'
+#on:
+ # push:
+  #  branches:
+   #   - main
+    #paths-ignore:
+     # - 'helm/**'
+      #- 'k8s/**'
+      #- 'README.md'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
