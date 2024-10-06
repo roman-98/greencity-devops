@@ -35,10 +35,10 @@ jobs:
           terraform_version: ${{ inputs.tf_version }}
           cli_config_credentials_token: ${{ secrets.cli_config_credentials_token }}
 
-      - name: Create .auto.tfvars file
-        run: |
-          echo "username = \"${{ secrets.DATASOURCE_USER }}\"" >> terraform.auto.tfvars
-          echo "password = \"${{ secrets.DATASOURCE_PASSWORD }}\"" >> terraform.auto.tfvars
+      #- name: Create .auto.tfvars file
+       # run: |
+        #  echo "username = \"${{ secrets.DATASOURCE_USER }}\"" >> terraform.auto.tfvars
+         # echo "password = \"${{ secrets.DATASOURCE_PASSWORD }}\"" >> terraform.auto.tfvars
 
       - name: Terraform Init
         id: init
