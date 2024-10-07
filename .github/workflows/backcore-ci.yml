@@ -105,7 +105,7 @@ jobs:
 
       - name: Update Helm chart version
         run: |
-          CHART_YAML=helm/backuser-chart/Chart.yaml
+          CHART_YAML=helm/backcore-chart/Chart.yaml
           CURRENT_VERSION=$(grep 'version:' $CHART_YAML | awk '{print $2}')
           NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
           sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" $CHART_YAML
@@ -113,7 +113,7 @@ jobs:
 
       - name: Update app version to GitHub Run ID
         run: |
-          CHART_YAML=helm/backuser-chart/Chart.yaml
+          CHART_YAML=helm/backcore-chart/Chart.yaml
           NEW_APP_VERSION=${{ github.run_id }}
           sed -i "s/appVersion: .*/appVersion: \"$NEW_APP_VERSION\"/" $CHART_YAML
           echo "APP_VERSION=$NEW_APP_VERSION" >> $GITHUB_ENV
@@ -122,11 +122,11 @@ jobs:
         run: |
           VERSION="${{ github.run_id }}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          sed -i 's/^ *tag: *".*"/tag: "'"$VERSION"'"/' helm/backuser-chart/values.yaml
+          sed -i 's/^ *tag: *".*"/tag: "'"$VERSION"'"/' helm/backcore-chart/values.yaml
 
       - name: Commit and push changes
         run: |
-          git add helm/backuser-chart/Chart.yaml helm/backuser-chart/values.yaml
+          git add helm/backcore-chart/Chart.yaml helm/backcore-chart/values.yaml
           git commit -m "Update Helm chart to version ${{ env.CHART_VERSION }} with app version ${{ env.APP_VERSION }}"
           git push --force origin main
 
