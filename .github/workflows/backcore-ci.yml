@@ -128,7 +128,7 @@ jobs:
         run: |
           git add helm/backcore-chart/Chart.yaml helm/backcore-chart/values.yaml
           git commit -m "Update Helm chart to version ${{ env.CHART_VERSION }} with app version ${{ env.APP_VERSION }}"
-          git pull && git push
+          git pull --no-rebase && git push
 
   notify:
     name: Notify on completion

@@ -128,7 +128,7 @@ jobs:
         run: |
           git add helm/frontend-chart/Chart.yaml helm/frontend-chart/values.yaml
           git commit -m "Update Helm chart to version ${{ env.CHART_VERSION }} with app version ${{ env.APP_VERSION }}"
-          git pull && git push
+          git pull --no-rebase && git push
 
   notify:
     name: Notify on completion
