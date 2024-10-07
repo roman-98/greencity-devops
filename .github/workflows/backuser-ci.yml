@@ -75,8 +75,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
-      - name: Set version
-        run: echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
+      - name: Set version using GitHub Run ID
+        run: echo "VERSION=${{ github.run_id }}" >> $GITHUB_ENV
       - name: Build and push backuser image
         uses: docker/build-push-action@v4
         with:
@@ -111,16 +111,16 @@ jobs:
           sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" $CHART_YAML
           echo "CHART_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-      - name: Update app version
+      - name: Update app version to GitHub Run ID
         run: |
           CHART_YAML=helm/backuser-chart/Chart.yaml
           NEW_APP_VERSION=${{ github.run_id }}
           sed -i "s/appVersion: .*/appVersion: \"$NEW_APP_VERSION\"/" $CHART_YAML
           echo "APP_VERSION=$NEW_APP_VERSION" >> $GITHUB_ENV
 
-      - name: Update values.yaml with short commit hash
+      - name: Update values.yaml with GitHub Run ID as tag
         run: |
-          VERSION="1.0.0-${GITHUB_SHA::7}"
+          VERSION="${{ github.run_id }}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           sed -i 's/^ *tag: *".*"/tag: "'"$VERSION"'"/' helm/backuser-chart/values.yaml
 
@@ -129,44 +129,6 @@ jobs:
           git add helm/backuser-chart/Chart.yaml helm/backuser-chart/values.yaml
           git commit -m "Update Helm chart to version ${{ env.CHART_VERSION }} with app version ${{ env.APP_VERSION }}"
           git push --force origin main
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v1
-        with:
-          version: 'v3.4.0'
-
-      - name: Package Helm chart
-        run: |
-          cd helm/backuser-chart/
-          helm package .
-          echo "HELM_CHART_PATH=$(ls *.tgz)" >> $GITHUB_ENV
-          echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
-        with:
-          tag_name: ${{ env.VERSION }}
-          release_name: Release v${{ github.run_id }}
-          body: |
-            Release of Helm chart version ${{ github.run_id }}
-           
-            Changes in this Release:
-            - Updated Helm chart
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./helm/backuser-chart/${{ env.HELM_CHART_PATH }}
-          asset_name: ${{ env.HELM_CHART_PATH }}
-          asset_content_type: application/gzip
 
   notify:
     name: Notify on completion
