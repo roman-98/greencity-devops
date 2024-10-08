@@ -50,7 +50,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: cd terraform/ && terraform plan
+        run: cd terraform/ && terraform plan -var-file=terraform.auto.tfvars
         continue-on-error: true
 
       - name: Terraform Plan Status
