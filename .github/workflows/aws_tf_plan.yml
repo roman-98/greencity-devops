@@ -37,8 +37,8 @@ jobs:
 
       - name: Chenge terraform.tfvars file
         run: |
-          sed -i 's/your_username/${{ secrets.DATASOURCE_USER }}/' terraform.tfvars
-          sed -i 's/your_password/${{ secrets.DATASOURCE_PASSWORD }}/' terraform.tfvars
+          sed -i 's/your_username/${{ secrets.DATASOURCE_USER }}/' terraform/terraform.tfvars
+          sed -i 's/your_password/${{ secrets.DATASOURCE_PASSWORD }}/' terraform/terraform.tfvars
 
       - name: Terraform Init
         id: init
