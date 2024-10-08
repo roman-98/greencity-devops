@@ -37,8 +37,8 @@ jobs:
 
       - name: Create terraform.auto.tfvars file with secrets
         run: |
-          echo "username = \"${{ secrets.DATASOURCE_USER }}\"" > terraform.auto.tfvars
-          echo "password = \"${{ secrets.DATASOURCE_PASSWORD }}\"" >> terraform.auto.tfvars
+          echo "username = \"${{ secrets.DATASOURCE_USER }}\"" > terraform/terraform.auto.tfvars
+          echo "password = \"${{ secrets.DATASOURCE_PASSWORD }}\"" >> terraform/terraform.auto.tfvars
 
       - name: Terraform Init
         id: init
