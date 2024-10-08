@@ -35,10 +35,10 @@ jobs:
           terraform_version: ${{ inputs.tf_version }}
           cli_config_credentials_token: ${{ secrets.cli_config_credentials_token }}
 
-      - name: Create terraform.auto.tfvars file
+      - name: Chenge terraform.tfvars file
         run: |
-          echo "username = \"${{ secrets.DATASOURCE_USER }}\"" >> terraform.auto.tfvars
-          echo "password = \"${{ secrets.DATASOURCE_PASSWORD }}\"" >> terraform.auto.tfvars
+          sed -i 's/your_username/${{ secrets.DATASOURCE_USER }}/' terraform.tfvars
+          sed -i 's/your_password/${{ secrets.DATASOURCE_PASSWORD }}/' terraform.tfvars
 
       - name: Terraform Init
         id: init
@@ -48,5 +48,5 @@ jobs:
         run: cd terraform/ && terraform apply -auto-approve
         continue-on-error: true
 
-      - name: Terraform Destroy
-        run: cd terraform/ && terraform destroy -auto-approve
+      #- name: Terraform Destroy
+       # run: cd terraform/ && terraform destroy -auto-approve
