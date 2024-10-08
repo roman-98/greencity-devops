@@ -1,13 +1,13 @@
-name: GreenCity-CI
+name: Backcore CI
 
-#on:
- # push:
-  #  branches:
-   #   - main
-    #paths-ignore:
-     # - 'helm/**'
-      #- 'k8s/**'
-      #- 'README.md'
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'helm/**'
+      - 'k8s/**'
+      - 'README.md'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,21 +22,14 @@ jobs:
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
-          ssh-private-key: |
-            ${{ secrets.DEPLOY_KEY_BACKCORE }}
-            ${{ secrets.DEPLOY_KEY_BACKUSER }}
-            ${{ secrets.DEPLOY_KEY_FRONTEND }}
+          ssh-private-key: ${{ secrets.DEPLOY_KEY_BACKCORE }}
       - name: Configure SSH for GitHub
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_KEY_BACKCORE }}" > ~/.ssh/id_backcore
-          echo "${{ secrets.DEPLOY_KEY_BACKUSER }}" > ~/.ssh/id_backuser
-          echo "${{ secrets.DEPLOY_KEY_FRONTEND }}" > ~/.ssh/id_frontend
-          chmod 600 ~/.ssh/id_*
+          chmod 600 ~/.ssh/id_backcore
           ssh-keyscan github.com >> ~/.ssh/known_hosts
           echo -e "Host github.com-backcore\n HostName github.com\n User git\n IdentityFile ~/.ssh/id_backcore\n" >> ~/.ssh/config
-          echo -e "Host github.com-backuser\n HostName github.com\n User git\n IdentityFile ~/.ssh/id_backuser\n" >> ~/.ssh/config
-          echo -e "Host github.com-frontend\n HostName github.com\n User git\n IdentityFile ~/.ssh/id_frontend\n" >> ~/.ssh/config
       - name: Cache SSH configuration
         uses: actions/cache@v3
         with:
@@ -45,43 +38,35 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-ssh-
 
-  clone_repositories:
-    name: Clone Repository
+  clone_repository:
+    name: Clone Backcore Repository
     needs: setup
     runs-on: ubuntu-latest
-    environment: CI
-    strategy:
-      matrix:
-        repo: [backcore, backuser, frontend]
     steps:
       - name: Restore SSH configuration
         uses: actions/cache@v3
         with:
           path: ~/.ssh
           key: ${{ runner.os }}-ssh-${{ hashFiles('~/.ssh/**') }}
-      - name: Checkout ${{ matrix.repo }} repo
+      - name: Checkout backcore repo
         run: |
-          git clone git@github.com-${{ matrix.repo }}:DevOps-ProjectLevel/greencity-${{ matrix.repo }}-roman-98.git greencity-${{ matrix.repo }}-roman-98
-      - name: Cache ${{ matrix.repo }} repository
+          git clone git@github.com-backcore:DevOps-ProjectLevel/greencity-backcore-roman-98.git greencity-backcore-roman-98
+      - name: Cache backcore repository
         uses: actions/cache@v3
         with:
-          path: greencity-${{ matrix.repo }}-roman-98
-          key: ${{ runner.os }}-repo-${{ matrix.repo }}-${{ github.sha }}
+          path: greencity-backcore-roman-98
+          key: ${{ runner.os }}-repo-backcore-${{ github.sha }}
 
   build_and_push:
-    name: Build and Push 
-    needs: clone_repositories
+    name: Build and Push Backcore
+    needs: clone_repository
     runs-on: ubuntu-latest
-    environment: CI
-    strategy:
-      matrix:
-        component: [backcore, backuser, frontend]
     steps:
-      - name: Restore ${{ matrix.component }} repository
+      - name: Restore backcore repository
         uses: actions/cache@v3
         with:
-          path: greencity-${{ matrix.component }}-roman-98
-          key: ${{ runner.os }}-repo-${{ matrix.component }}-${{ github.sha }}
+          path: greencity-backcore-roman-98
+          key: ${{ runner.os }}-repo-backcore-${{ github.sha }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Log in to GitHub Container Registry
@@ -90,16 +75,16 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
-      - name: Set version
-        run: echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
-      - name: Build and push ${{ matrix.component }} image
+      - name: Set version with GitHub Run ID
+        run: echo "VERSION=${{ github.run_id }}" >> $GITHUB_ENV
+      - name: Build and push backcore image
         uses: docker/build-push-action@v4
         with:
-          context: ./greencity-${{ matrix.component }}-roman-98
+          context: ./greencity-backcore-roman-98
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/greencity-${{ matrix.component }}:${{ env.VERSION }}
-            ghcr.io/${{ github.repository_owner }}/greencity-${{ matrix.component }}:latest
+            ghcr.io/${{ github.repository_owner }}/greencity-backcore:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/greencity-backcore:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -120,68 +105,30 @@ jobs:
 
       - name: Update Helm chart version
         run: |
-          CHART_YAML=helm/greencity-chart/Chart.yaml
+          CHART_YAML=helm/backcore-chart/Chart.yaml
           CURRENT_VERSION=$(grep 'version:' $CHART_YAML | awk '{print $2}')
           NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
           sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" $CHART_YAML
           echo "CHART_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-      - name: Update app version
+      - name: Update app version to GitHub Run ID
         run: |
-          CHART_YAML=helm/greencity-chart/Chart.yaml
+          CHART_YAML=helm/backcore-chart/Chart.yaml
           NEW_APP_VERSION=${{ github.run_id }}
           sed -i "s/appVersion: .*/appVersion: \"$NEW_APP_VERSION\"/" $CHART_YAML
           echo "APP_VERSION=$NEW_APP_VERSION" >> $GITHUB_ENV
 
-      - name: Update values.yaml with short commit hash
+      - name: Update values.yaml with Run ID as tag
         run: |
-          VERSION="1.0.0-${GITHUB_SHA::7}"
+          VERSION="${{ github.run_id }}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          sed -i 's/^ *tag: *".*"/tag: "'"$VERSION"'"/' helm/greencity-chart/values.yaml
+          sed -i 's/^ *tag: *".*"/tag: "'"$VERSION"'"/' helm/backcore-chart/values.yaml
 
       - name: Commit and push changes
         run: |
-          git add helm/greencity-chart/Chart.yaml helm/greencity-chart/values.yaml
+          git add helm/backcore-chart/Chart.yaml helm/backcore-chart/values.yaml
           git commit -m "Update Helm chart to version ${{ env.CHART_VERSION }} with app version ${{ env.APP_VERSION }}"
-          git push
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v1
-        with:
-          version: 'v3.4.0'
-
-      - name: Package Helm chart
-        run: |
-          cd helm/greencity-chart/
-          helm package .
-          echo "HELM_CHART_PATH=$(ls *.tgz)" >> $GITHUB_ENV
-          echo "VERSION=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
-        with:
-          tag_name: ${{ env.VERSION }}
-          release_name: Release v${{ github.run_id }}
-          body: |
-            Release of Helm chart version ${{ github.run_id }}
-           
-            Changes in this Release:
-            - Updated Helm chart
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./helm/greencity-chart/${{ env.HELM_CHART_PATH }}
-          asset_name: ${{ env.HELM_CHART_PATH }}
-          asset_content_type: application/gzip
+          git pull --no-rebase && git push
 
   notify:
     name: Notify on completion
