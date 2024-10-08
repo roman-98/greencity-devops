@@ -154,6 +154,13 @@ resource "aws_security_group" "eks_sg" {
   }
 
   egress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [var.private_subnet_a_cidr, var.private_subnet_b_cidr]
+  }
+
+  egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
