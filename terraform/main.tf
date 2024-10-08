@@ -29,6 +29,7 @@ module "eks" {
 variable "username" {
   description = "The master username for the DB instance."
   type        = string
+  sensitive   = true
 }
 
 variable "password" {

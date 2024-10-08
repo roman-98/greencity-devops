@@ -3,5 +3,4 @@ dir/
 db/
 k8s/dev/app-configmap.yaml
 k8s/dev/app-secret.yaml
-terraform/
 aws/
