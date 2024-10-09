@@ -15,136 +15,142 @@ spec:
       labels:
         app: backcore
     spec:
-      serviceAccountName: my-app-service-account
+      serviceAccountName: myapp
       containers:
         - name: greencity-backcore
           image: ghcr.io/roman-98/greencity-backcore:{{ .Values.image.tag  }}
           env:
             - name: DATASOURCE_URL
-              value: "jdbc:postgresql://greencity.cdy6c040ysbs.eu-west-3.rds.amazonaws.com:5432/greencity"
-              
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: DATASOURCE_URL
+    
             - name: DATASOURCE_USER
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: DATASOURCE_USER
-
+  
             - name: DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
-                  key: DB_PASSWORD
-
+                  name: myapp-k8s-secret
+                  key: DATASOURCE_PASSWORD
+  
             - name: EMAIL_ADDRESS
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: EMAIL_ADDRESS
-
+  
             - name: EMAIL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: EMAIL_PASSWORD
 
             - name: GOOGLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: GOOGLE_CLIENT_ID
 
             - name: GOOGLE_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: GOOGLE_API_KEY
 
             - name: GOOGLE_CLIENT_ID_MANAGER
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: GOOGLE_CLIENT_ID_MANAGER
 
             - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /app/google-creds.json
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-k8s-secret
+                  key: GOOGLE_APPLICATION_CREDENTIALS
 
             - name: CLOUD_NAME
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: CLOUD_NAME
-
+  
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: API_KEY
-
+  
             - name: API_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: API_SECRET
-
+  
             - name: MAX_FILE_SIZE
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: MAX_FILE_SIZE
-
+  
             - name: MAX_REQUEST_SIZE
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: MAX_REQUEST_SIZE
 
             - name: BUCKET_NAME
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: BUCKET_NAME
 
             - name: STATIC_URL
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: STATIC_URL
 
             - name: DEFAULT_PROFILE_PICTURE
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: DEFAULT_PROFILE_PICTURE
 
             - name: AZURE_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: AZURE_CONNECTION_STRING
 
             - name: AZURE_CONTAINER_NAME
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: AZURE_CONTAINER_NAME
 
             - name: EndpointSuffix
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: EndpointSuffix
 
             - name: CHAT_LINK
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: CHAT_LINK
 
             - name: PROFILE
               valueFrom:
                 secretKeyRef:
-                  name: aws-secrets-manager
+                  name: myapp-k8s-secret
                   key: PROFILE
-
+                  
           ports:
             - containerPort: 8080
