@@ -137,35 +137,9 @@ resource "aws_route_table_association" "private_b" {
 }
 
 resource "aws_security_group" "eks_sg" {
-  vpc_id = aws_vpc.this.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = [var.private_subnet_a_cidr, var.private_subnet_b_cidr]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  name        = "eks_security_group"
+  description = "Security group for EKS cluster"
+  vpc_id      = aws_vpc.this.id
 
   tags = {
     Name = "eks_security_group"
@@ -174,28 +148,94 @@ resource "aws_security_group" "eks_sg" {
   depends_on = [aws_route_table_association.private_b]
 }
 
+resource "aws_vpc_security_group_ingress_rule" "eks_http" {
+  security_group_id = aws_security_group.eks_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+
+resource "aws_vpc_security_group_ingress_rule" "eks_https" {
+  security_group_id = aws_security_group.eks_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
+resource "aws_vpc_security_group_ingress_rule" "eks_self" {
+  security_group_id            = aws_security_group.eks_sg.id
+  referenced_security_group_id = aws_security_group.eks_sg.id
+  ip_protocol                  = "-1"
+}
+
+resource "aws_vpc_security_group_egress_rule" "eks_to_rds" {
+  security_group_id = aws_security_group.eks_sg.id
+  cidr_ipv4         = var.private_subnet_a_cidr
+  from_port         = 5432
+  ip_protocol       = "tcp"
+  to_port           = 5432
+}
+
+resource "aws_vpc_security_group_egress_rule" "eks_to_rds_b" {
+  security_group_id = aws_security_group.eks_sg.id
+  cidr_ipv4         = var.private_subnet_b_cidr
+  from_port         = 5432
+  ip_protocol       = "tcp"
+  to_port           = 5432
+}
+
+resource "aws_vpc_security_group_egress_rule" "eks_outbound" {
+  security_group_id = aws_security_group.eks_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
+
 resource "aws_security_group" "rds_sg" {
-  vpc_id = aws_vpc.this.id
-
-  ingress {
-    from_port   = 5432  
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = [var.private_subnet_a_cidr, var.private_subnet_b_cidr]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [var.cidr_block, var.private_subnet_a_cidr, var.private_subnet_b_cidr]
-  }
+  name        = "rds_security_group"
+  description = "Security group for RDS instance"
+  vpc_id      = aws_vpc.this.id
 
   tags = {
     Name = "rds_security_group"
   }
 
   depends_on = [aws_security_group.eks_sg]
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rds_from_subnet_a" {
+  security_group_id = aws_security_group.rds_sg.id
+  cidr_ipv4         = var.private_subnet_a_cidr
+  from_port         = 5432
+  ip_protocol       = "tcp"
+  to_port           = 5432
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rds_from_subnet_b" {
+  security_group_id = aws_security_group.rds_sg.id
+  cidr_ipv4         = var.private_subnet_b_cidr
+  from_port         = 5432
+  ip_protocol       = "tcp"
+  to_port           = 5432
+}
+
+resource "aws_vpc_security_group_egress_rule" "rds_outbound_vpc" {
+  security_group_id = aws_security_group.rds_sg.id
+  cidr_ipv4         = var.cidr_block
+  ip_protocol       = "-1"
+}
+
+resource "aws_vpc_security_group_egress_rule" "rds_outbound_subnet_a" {
+  security_group_id = aws_security_group.rds_sg.id
+  cidr_ipv4         = var.private_subnet_a_cidr
+  ip_protocol       = "-1"
+}
+
+resource "aws_vpc_security_group_egress_rule" "rds_outbound_subnet_b" {
+  security_group_id = aws_security_group.rds_sg.id
+  cidr_ipv4         = var.private_subnet_b_cidr
+  ip_protocol       = "-1"
 }
 
 resource "aws_db_subnet_group" "my_db_subnet_group" {

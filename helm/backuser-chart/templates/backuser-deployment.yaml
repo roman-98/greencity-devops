@@ -24,133 +24,133 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: datasourceUrl
+                  key: DATASOURCE_URL
     
             - name: DATASOURCE_USER
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: datasourceUser
+                  key: DATASOURCE_USER
   
             - name: DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: datasourcePassword
+                  key: DATASOURCE_PASSWORD
   
             - name: EMAIL_ADDRESS
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: emailAddress
+                  key: EMAIL_ADDRESS
   
             - name: EMAIL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: emailPassword
+                  key: EMAIL_PASSWORD
 
             - name: GOOGLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: googleClientId
+                  key: GOOGLE_CLIENT_ID
 
             - name: GOOGLE_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: googleApiKey
+                  key: GOOGLE_API_KEY
 
             - name: GOOGLE_CLIENT_ID_MANAGER
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: googleClientIdManager
+                  key: GOOGLE_CLIENT_ID_MANAGER
 
             - name: GOOGLE_APPLICATION_CREDENTIALS
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: googleApplicationCredentials
+                  key: GOOGLE_APPLICATION_CREDENTIALS
 
             - name: CLOUD_NAME
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: cloudName
+                  key: CLOUD_NAME
   
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: apiKey
+                  key: API_KEY
   
             - name: API_SECRET
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: apiSecret
+                  key: API_SECRET
   
             - name: MAX_FILE_SIZE
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: maxFileSize
+                  key: MAX_FILE_SIZE
   
             - name: MAX_REQUEST_SIZE
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: maxRequestSize
+                  key: MAX_REQUEST_SIZE
 
             - name: BUCKET_NAME
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: bucketName
+                  key: BUCKET_NAME
 
             - name: STATIC_URL
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: staticUrl
+                  key: STATIC_URL
 
             - name: DEFAULT_PROFILE_PICTURE
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: defaultProfilePicture
+                  key: DEFAULT_PROFILE_PICTURE
 
             - name: AZURE_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: azureConnectionString
+                  key: AZURE_CONNECTION_STRING
 
             - name: AZURE_CONTAINER_NAME
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: azureContainerName
+                  key: AZURE_CONTAINER_NAME
 
             - name: EndpointSuffix
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: endpointSuffix
+                  key: EndpointSuffix
 
             - name: CHAT_LINK
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: chatLink
+                  key: CHAT_LINK
 
             - name: PROFILE
               valueFrom:
                 secretKeyRef:
                   name: myapp-k8s-secret
-                  key: profile
+                  key: PROFILE
 
           ports:
             - containerPort: 8060
