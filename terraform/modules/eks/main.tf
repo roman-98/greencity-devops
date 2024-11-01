@@ -1,89 +1,160 @@
-resource "aws_eks_cluster" "main" {
-  name     = var.cluster_name
-  role_arn = aws_iam_role.eks_cluster.arn
-
-  vpc_config {
-    subnet_ids              = [var.private_subnet_a_id, var.private_subnet_b_id]
-    security_group_ids      = [var.eks_security_group_id]
-    endpoint_private_access = true
-    endpoint_public_access  = true
+resource "aws_iam_role" "eks-cluster-role" {
+  name = "eks-cluster-role"
+  tags = {
+    tag-key = "eks-cluster-role"
   }
-
-  access_config {
-    authentication_mode                         = "API"
-    bootstrap_cluster_creator_admin_permissions = true
-  }
-
-  depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
-}
-
-resource "aws_eks_node_group" "main" {
-  cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "${var.cluster_name}-node-group"
-  node_role_arn   = aws_iam_role.eks_nodes.arn
-  subnet_ids      = [var.private_subnet_a_id, var.private_subnet_b_id]
-
-  scaling_config {
-    desired_size = var.desired_size
-    max_size     = var.max_size
-    min_size     = var.min_size
-  }
-
-  depends_on = [aws_iam_role_policy_attachment.eks_nodes_policy]
-}
-
-resource "aws_iam_role" "eks_cluster" {
-  name = "${var.cluster_name}-eks-cluster-role"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
+    Statement = [{
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
           Service = "eks.amazonaws.com"
         }
-      }
-    ]
+      }]
+    Version = "2012-10-17"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+resource "aws_iam_role_policy_attachment" "eks-AmazonEKSClusterPolicy" {
+  role       = aws_iam_role.eks-cluster-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.eks_cluster.name
 }
 
-resource "aws_iam_role" "eks_nodes" {
-  name = "${var.cluster_name}-eks-nodes-role"
+resource "aws_eks_cluster" "main" {
+  name     = var.cluster_name
+  role_arn = aws_iam_role.eks-cluster-role.arn
+
+  vpc_config {
+    subnet_ids = flatten([var.private_subnet_ids, var.public_subnet_ids])
+  }
+
+  depends_on = [aws_iam_role_policy_attachment.eks-AmazonEKSClusterPolicy]
+}
+
+resource "aws_iam_role" "nodes" {
+  name = "eks-node-group-nodes"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
+    Statement = [{
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
           Service = "ec2.amazonaws.com"
         }
-      }
-    ]
+      }]
+    Version = "2012-10-17"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "eks_admin_nodes_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
-  role       = aws_iam_role.eks_nodes.name
-}
-
-resource "aws_iam_role_policy_attachment" "eks_nodes_policy" {
+resource "aws_iam_role_policy_attachment" "nodes-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.eks_nodes.name
+  role       = aws_iam_role.nodes.name
 }
 
-resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+resource "aws_iam_role_policy_attachment" "nodes-AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.eks_nodes.name
+  role       = aws_iam_role.nodes.name
+}
+
+resource "aws_iam_role_policy_attachment" "nodes-AmazonEC2ContainerRegistryReadOnly" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.nodes.name
+}
+
+resource "aws_eks_node_group" "private-nodes" {
+  cluster_name    = aws_eks_cluster.main.name
+  node_group_name = "private-nodes"
+  node_role_arn   = aws_iam_role.nodes.arn
+  subnet_ids      = var.private_subnet_ids
+
+  capacity_type  = "ON_DEMAND"
+  ami_type       = "AL2_x86_64"
+  disk_size      = 20
+  instance_types = ["t3.medium"]
+
+  scaling_config {
+    desired_size = 2
+    max_size     = 8
+    min_size     = 1
+  }
+
+  tags = {
+    Name = "${var.node_group_name}-private"
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.nodes-AmazonEKSWorkerNodePolicy,
+    aws_iam_role_policy_attachment.nodes-AmazonEKS_CNI_Policy,
+    aws_iam_role_policy_attachment.nodes-AmazonEC2ContainerRegistryReadOnly
+  ]
+}
+
+resource "aws_security_group" "eks_cluster" {
+  name   = var.cluster_sg_name
+  vpc_id = var.vpc_id
+
+  tags = {
+    Name = var.cluster_sg_name
+  }
+}
+
+resource "aws_security_group_rule" "cluster_inbound" {
+  description              = "Allow worker nodes to communicate with the cluster API Server"
+  from_port                = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_cluster.id
+  source_security_group_id = aws_security_group.eks_nodes.id
+  to_port                  = 443
+  type                     = "ingress"
+}
+
+resource "aws_security_group_rule" "cluster_outbound" {
+  description              = "Allow cluster API Server to communicate with the worker nodes"
+  from_port                = 1024
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_cluster.id
+  source_security_group_id = aws_security_group.eks_nodes.id
+  to_port                  = 65535
+  type                     = "egress"
+}
+
+resource "aws_security_group" "eks_nodes" {
+  name        = var.eks_node_sg_name
+  description = "Security group for all nodes in the cluster"
+  var_id      = var.vpc_id
+
+  egress = {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name                                        = var.eks_node_sg_name
+    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+  }
+}
+
+resource "aws_security_group_rule" "nodes" {
+  description              = "Allow nodes to communicate with each other"
+  from_port                = 0
+  protocol                 = "-1"
+  security_group_id        = aws_security_group.eks_cluster.id
+  source_security_group_id = aws_security_group.eks_nodes.id
+  to_port                  = 65535
+  type                     = "ingress"
+}
+
+resource "aws_security_group_rule" "nodes_inbound" {
+  description              = "Allow worker Kubelets and pods to receive communication from the cluster control plane"
+  from_port                = 1025
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_cluster.id
+  source_security_group_id = aws_security_group.eks_nodes.id
+  to_port                  = 65535
+  type                     = "ingress"
 }
 
 provider "kubernetes" {
