@@ -9,13 +9,13 @@ variable "cluster_name" {
 }
 
 variable "private_subnet_ids" {
-  description = "Private subnets IDs"
-  type        = string
+  description = "List of private subnet IDs for the EKS node group"
+  type        = list(string)
 }
 
 variable "public_subnet_ids" {
-  description = "Public subnets IDs"
-  type        = string
+  description = "List of public subnet IDs for the EKS node group"
+  type        = list(string)
 }
 
 variable "node_group_name" {

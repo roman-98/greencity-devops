@@ -66,7 +66,7 @@ resource "aws_eks_node_group" "private-nodes" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "private-nodes"
   node_role_arn   = aws_iam_role.nodes.arn
-  subnet_ids      = var.vpc.private_subnet_ids
+  subnet_ids      = var.private_subnet_ids
 
   capacity_type  = "ON_DEMAND"
   ami_type       = "AL2_x86_64"
@@ -124,12 +124,12 @@ resource "aws_security_group" "eks_nodes" {
   description = "Security group for all nodes in the cluster"
   vpc_id      = var.vpc_id
 
-  egress = {
+  egress = [{
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
+  }]
 
   tags = {
     Name                                        = var.eks_node_sg_name
@@ -267,8 +267,6 @@ output "secret_content" {
     db_secret     = local.db_secret
   }
   sensitive = true
-
-  depends_on = [aws_eks_node_group.main]
 }
 
 resource "kubernetes_secret" "myapp_k8s_secret" {
