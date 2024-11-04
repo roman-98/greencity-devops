@@ -1,8 +1,6 @@
 module "vpc" {
   source         = "./modules/vpc"
-  region         = var.region
-  vpc_cidr_block = var.vpc_cidr_block
-  cluster_name   = var.cluster_name
+  cluster_name   = "main"
 }
 
 module "rds" {
@@ -23,13 +21,10 @@ module "rds" {
 
 module "eks" {
   source             = "./modules/eks"
-  vpc_id             = module.vpc.vpc_id
-  cluster_sg_name    = "${var.cluster_name}-cluster-sg"
-  nodes_sg_name      = "${var.cluster_name}-node-sg"
-  node_group_name    = "${var.cluster_name}-node-group"
-  private_subnet_ids = module.vpc.private_subnet_ids
-  publc_subnet_ids   = module.vpc.publc_subnet_ids
-  cluster_name       = var.cluster_name 
+  cluster_sg_name    = "main-cluster-sg"
+  node_group_name    = "main-node-group"
+  cluster_name       = "main" 
+  eks_node_sg_name   = "main-eks-node-sg"
 }
 
 variable "username" {
