@@ -1,5 +1,20 @@
+variable "vpc_id" {
+  description = "Name of the EKS cluster"
+  type        = string
+}
+
 variable "cluster_name" {
   description = "Name of the EKS cluster"
+  type        = string
+}
+
+variable "private_subnet_ids" {
+  description = "Private subnets IDs"
+  type        = string
+}
+
+variable "public_subnet_ids" {
+  description = "Public subnets IDs"
   type        = string
 }
 

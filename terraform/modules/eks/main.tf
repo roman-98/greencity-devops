@@ -26,7 +26,7 @@ resource "aws_eks_cluster" "main" {
   role_arn = aws_iam_role.eks-cluster-role.arn
 
   vpc_config {
-    subnet_ids = flatten([var.vpc.private_subnet_ids, var.vpc.public_subnet_ids])
+    subnet_ids = flatten([var.private_subnet_ids, var.public_subnet_ids])
   }
 
   depends_on = [aws_iam_role_policy_attachment.eks-AmazonEKSClusterPolicy]
@@ -92,7 +92,7 @@ resource "aws_eks_node_group" "private-nodes" {
 
 resource "aws_security_group" "eks_cluster" {
   name   = var.cluster_sg_name
-  vpc_id = var.vpc.vpc_id
+  vpc_id = var.vpc_id
 
   tags = {
     Name = var.cluster_sg_name
@@ -122,7 +122,7 @@ resource "aws_security_group_rule" "cluster_outbound" {
 resource "aws_security_group" "eks_nodes" {
   name        = var.eks_node_sg_name
   description = "Security group for all nodes in the cluster"
-  vpc_id      = var.vpc.vpc_id
+  vpc_id      = var.vpc_id
 
   egress = {
     from_port   = 0
