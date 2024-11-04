@@ -25,8 +25,6 @@ module "eks" {
   node_group_name    = "${var.eks.cluster_name}-node-group"
   eks_node_sg_name   = "${var.eks.cluster_name}-node-sg"
   cluster_name       = var.eks.cluster_name
-
-  depends_on = [module.vpc]
 }
 
 variable "username" {

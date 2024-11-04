@@ -127,7 +127,7 @@ resource "aws_route_table_association" "public-eu-west-3a" {
   route_table_id = aws_route_table.public.id
 }
 
-resource "aws_route_table_association" "public-eu-west-3a" {
+resource "aws_route_table_association" "public-eu-west-3b" {
   subnet_id = aws_subnet.public-eu-west-3a.id
   route_table_id = aws_route_table.public.id
 }
