@@ -124,12 +124,12 @@ resource "aws_security_group" "eks_nodes" {
   description = "Security group for all nodes in the cluster"
   vpc_id      = var.vpc_id
 
-  egress = [{
+  egress = {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }]
+  }
 
   tags = {
     Name                                        = var.eks_node_sg_name
