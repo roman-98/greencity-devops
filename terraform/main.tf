@@ -1,29 +1,32 @@
 module "vpc" {
-  source = "./modules/vpc"
+  source             = "./modules/vpc"
+  cluster_name       = var.eks.cluster_name
 }
 
 module "rds" {
-  source = "./modules/rds"
-
-  username             = var.username  
-  password             = var.password 
-
-  vpc_security_group_ids = [module.vpc.rds_security_group_id]
-  subnet_group_name      = module.vpc.rds_subnet_group_name
-  subnet_ids             = [
-    module.vpc.private_subnet_a_id,
-    module.vpc.private_subnet_b_id
-  ]
+  source             = "./modules/rds"
+  name               = var.rds.name
+  subnet_ids         = module.vpc.private_subnet_ids
+  vpc_id             = module.vpc.vpc_id
+  allocated_storage  = var.rds.allocated_storage
+  engine             = var.rds.engine
+  engine_version     = var.rds.engine_version
+  instance_class     = var.rds.instance_class
+  db_name            = var.rds.db_name
+  username           = var.username  
+  password           = var.password 
 
   depends_on = [module.vpc]
 }
 
 module "eks" {
-  source = "./modules/eks"
+  source             = "./modules/eks"
+  cluster_sg_name    = "${var.eks.cluster_name}-cluster-sg"
+  node_group_name    = "${var.eks.cluster_name}-node-group"
+  eks_node_sg_name   = "${var.eks.cluster_name}-node-sg"
+  cluster_name       = var.eks.cluster_name
 
-  private_subnet_a_id   = module.vpc.private_subnet_a_id
-  private_subnet_b_id   = module.vpc.private_subnet_b_id
-  eks_security_group_id = module.vpc.eks_security_group_id
+  depends_on = [module.vpc]
 }
 
 variable "username" {

@@ -44,13 +44,13 @@ variable db_name {
   default     = "greencity"
 }
 
-variable db_username {
+variable username {
   description = "The master username for the DB instance"
   type        = string
   sensitive   = true
 }
 
-variable db_password {
+variable password {
   description = "The master password for the DB instance"
   type        = string
   sensitive   = true

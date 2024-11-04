@@ -3,7 +3,7 @@ name: "GreenCity-Terraform"
 on:
   push:
     branches:
-      #- tf-changes
+      - tf-changes
     paths-ignore:
       - 'helm/**'
       - 'k8s/**'
