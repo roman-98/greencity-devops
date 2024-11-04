@@ -5,14 +5,8 @@ module "vpc" {
 
 module "rds" {
   source            = "./modules/rds"
-  name              = var.rds.name
   subnet_ids        = module.vpc.private_subnet_ids
   vpc_id            = module.vpc.vpc_id
-  allocated_storage = var.rds.allocated_storage
-  engine            = var.rds.engine
-  engine_version    = var.rds.engine_version
-  instance_class    = var.rds.instance_class
-  db_name           = var.rds.db_name
   username          = var.username  
   password          = var.password 
 
