@@ -30,8 +30,6 @@ module "eks" {
   private_subnet_ids = module.vpc.private_subnet_ids
   publc_subnet_ids   = module.vpc.publc_subnet_ids
   cluster_name       = var.cluster_name 
-
-  depends_on = [module.vpc]
 }
 
 variable "username" {
