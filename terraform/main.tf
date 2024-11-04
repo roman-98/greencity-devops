@@ -21,8 +21,11 @@ module "rds" {
 
 module "eks" {
   source             = "./modules/eks"
+  vpc_id             = module.vpc.vpc_id
   cluster_sg_name    = "main-cluster-sg"
   node_group_name    = "main-node-group"
+  private_subnet_ids = module.vpc.private_subnet_ids
+  public_subnet_ids  = module.vpc.public_subnet_ids 
   cluster_name       = "main" 
   eks_node_sg_name   = "main-eks-node-sg"
 }
