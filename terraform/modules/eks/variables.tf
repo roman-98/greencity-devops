@@ -11,7 +11,6 @@ variable "cluster_name" {
 variable "private_subnet_ids" {
   description = "List of private subnet IDs for the EKS node group"
   type        = list(string)
-  default = ["subnet-0efd39a1cfc6868b5", "subnet-0f45185d61492a46c"]
 }
 
 variable "public_subnet_ids" {

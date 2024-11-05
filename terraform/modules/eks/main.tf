@@ -47,6 +47,11 @@ resource "aws_iam_role" "nodes" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "nodes-AdminNodesPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  role       = aws_iam_role.nodes.name
+}
+
 resource "aws_iam_role_policy_attachment" "nodes-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.nodes.name
@@ -84,6 +89,7 @@ resource "aws_eks_node_group" "private-nodes" {
   }
 
   depends_on = [
+    aws_iam_role_policy_attachment.nodes-AdminNodesPolicy,
     aws_iam_role_policy_attachment.nodes-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.nodes-AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.nodes-AmazonEC2ContainerRegistryReadOnly
