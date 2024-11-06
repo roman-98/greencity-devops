@@ -1,45 +1,34 @@
-variable "region" {
-  description = "AWS region"
+variable "vpc_id" {
+  description = "Name of the EKS cluster"
   type        = string
-  default     = "eu-west-3"
 }
 
 variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
-  default     = "my-eks-cluster"
 }
 
-variable "private_subnet_a_id" {
-  description = "ID of the first private subnet"
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs for the EKS node group"
+  type        = list(string)
+}
+
+variable "public_subnet_ids" {
+  description = "List of public subnet IDs for the EKS node group"
+  type        = list(string)
+}
+
+variable "node_group_name" {
+  description = "Name of the EKS cluster"
   type        = string
 }
 
-variable "private_subnet_b_id" {
-  description = "ID of the second private subnet"
+variable "cluster_sg_name" {
+  description = "ID of the cluster security group"
   type        = string
 }
 
-variable "eks_security_group_id" {
-  description = "ID of the EKS security group"
+variable "nodes_sg_name" {
+  description = "ID of the nodes security group"
   type        = string
 }
-
-variable "desired_size" {
-  description = "Desired number of worker nodes"
-  type        = number
-  default     = 1
-}
-
-variable "max_size" {
-  description = "Maximum number of worker nodes"
-  type        = number
-  default     = 4
-}
-
-variable "min_size" {
-  description = "Minimum number of worker nodes"
-  type        = number
-  default     = 1
-}
-

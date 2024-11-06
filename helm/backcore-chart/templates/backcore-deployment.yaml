@@ -18,7 +18,7 @@ spec:
       serviceAccountName: myapp
       containers:
         - name: greencity-backcore
-          image: ghcr.io/roman-98/greencity-backcore:{{ .Values.image.tag  }}
+          image: ghcr.io/roman-98/greencity-backcore:{{ .Values.backcore-chart.image.tag  }}
           env:
             - name: DATASOURCE_URL
               valueFrom:

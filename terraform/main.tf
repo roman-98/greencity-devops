@@ -1,29 +1,25 @@
 module "vpc" {
-  source = "./modules/vpc"
+  source         = "./modules/vpc"
+  cluster_name   = "main"
 }
 
 module "rds" {
-  source = "./modules/rds"
-
-  username             = var.username  
-  password             = var.password 
-
-  vpc_security_group_ids = [module.vpc.rds_security_group_id]
-  subnet_group_name      = module.vpc.rds_subnet_group_name
-  subnet_ids             = [
-    module.vpc.private_subnet_a_id,
-    module.vpc.private_subnet_b_id
-  ]
-
-  depends_on = [module.vpc]
+  source            = "./modules/rds"
+  subnet_ids        = module.vpc.private_subnet_ids
+  vpc_id            = module.vpc.vpc_id
+  username          = var.username  
+  password          = var.password 
 }
 
 module "eks" {
-  source = "./modules/eks"
-
-  private_subnet_a_id   = module.vpc.private_subnet_a_id
-  private_subnet_b_id   = module.vpc.private_subnet_b_id
-  eks_security_group_id = module.vpc.eks_security_group_id
+  source             = "./modules/eks"
+  vpc_id             = module.vpc.vpc_id
+  cluster_sg_name    = "main-cluster-sg"
+  nodes_sg_name      = "main-node-sg"
+  node_group_name    = "main-node-group"
+  private_subnet_ids = module.vpc.private_subnet_ids
+  public_subnet_ids  = module.vpc.public_subnet_ids 
+  cluster_name       = "main" 
 }
 
 variable "username" {
