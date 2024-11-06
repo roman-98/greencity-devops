@@ -128,7 +128,7 @@ resource "aws_security_group_rule" "cluster_outbound" {
 }
 
 resource "aws_security_group" "eks_nodes" {
-  name        = var.eks_node_sg_name
+  name        = var.nodes_sg_name
   description = "Security group for all nodes in the cluster"
   vpc_id      = var.vpc_id
 
@@ -140,7 +140,7 @@ resource "aws_security_group" "eks_nodes" {
   }
 
   tags = {
-    Name                                        = var.eks_node_sg_name
+    Name                                        = var.nodes_sg_name
     "kubernetes.io/cluster/${var.cluster_name}" = "owned"
   }
 }
