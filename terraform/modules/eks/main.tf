@@ -27,6 +27,8 @@ resource "aws_eks_cluster" "main" {
 
   vpc_config {
     subnet_ids = flatten([var.private_subnet_ids, var.public_subnet_ids])
+    endpoint_private_access = true
+    endpoint_public_access  = true
   }
 
   depends_on = [aws_iam_role_policy_attachment.eks-AmazonEKSClusterPolicy]
