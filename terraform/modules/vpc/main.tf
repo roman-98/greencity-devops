@@ -1,6 +1,6 @@
 resource "aws_vpc" "main" {
-  cidr_block = var.vpc_cidr_block
-  enable_dns_support = true
+  cidr_block           = var.vpc_cidr_block
+  enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
@@ -9,52 +9,52 @@ resource "aws_vpc" "main" {
 }
 
 resource "aws_subnet" "private-eu-west-3a" {
-  vpc_id = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.1.0/24"
   availability_zone = "eu-west-3a"
 
   tags = {
     "Name"                                      = "private-eu-west-3a"
     "kubernetes.io/role/internal-elb"           = "1"
-    "kubernetes/io/cluster/${var.cluster_name}" = "owned"
+    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
   }
 }
 
 resource "aws_subnet" "private-eu-west-3b" {
-  vpc_id = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/24"
   availability_zone = "eu-west-3b"
 
   tags = {
     "Name"                                      = "private-eu-west-3b"
     "kubernetes.io/role/internal-elb"           = "1"
-    "kubernetes/io/cluster/${var.cluster_name}" = "owned"
+    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
   }
 }
 
 resource "aws_subnet" "public-eu-west-3a" {
-  vpc_id = aws_vpc.main.id
-  cidr_block = "10.0.3.0/24"
-  availability_zone = "eu-west-3a"
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.3.0/24"
+  availability_zone       = "eu-west-3a"
   map_public_ip_on_launch = true
 
   tags = {
     "Name"                                      = "public-eu-west-3a"
     "kubernetes.io/role/elb"                    = "1"
-    "kubernetes/io/cluster/${var.cluster_name}" = "owned"
+    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
   }
 }
 
 resource "aws_subnet" "public-eu-west-3b" {
-  vpc_id = aws_vpc.main.id
-  cidr_block = "10.0.4.0/24"
-  availability_zone = "eu-west-3b"
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.4.0/24"
+  availability_zone       = "eu-west-3b"
   map_public_ip_on_launch = true
 
   tags = {
     "Name"                                      = "public-eu-west-3b"
     "kubernetes.io/role/elb"                    = "1"
-    "kubernetes/io/cluster/${var.cluster_name}" = "owned"
+    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
   }
 }
 
@@ -113,21 +113,21 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "private-eu-west-3a" {
-  subnet_id = aws_subnet.private-eu-west-3a.id
+  subnet_id      = aws_subnet.private-eu-west-3a.id
   route_table_id = aws_route_table.private.id
 }
 
 resource "aws_route_table_association" "private-eu-west-3b" {
-  subnet_id = aws_subnet.private-eu-west-3a.id
+  subnet_id      = aws_subnet.private-eu-west-3b.id
   route_table_id = aws_route_table.private.id
 }
 
 resource "aws_route_table_association" "public-eu-west-3a" {
-  subnet_id = aws_subnet.public-eu-west-3a.id
+  subnet_id      = aws_subnet.public-eu-west-3a.id
   route_table_id = aws_route_table.public.id
 }
 
 resource "aws_route_table_association" "public-eu-west-3b" {
-  subnet_id = aws_subnet.public-eu-west-3a.id
+  subnet_id      = aws_subnet.public-eu-west-3b.id
   route_table_id = aws_route_table.public.id
 }
